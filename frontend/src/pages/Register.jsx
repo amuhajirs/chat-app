@@ -28,9 +28,9 @@ function Register() {
         }
     }
     return (
-        <div className="container d-flex align-items-center justify-content-center" style={{height: '100vh'}}>
-            <div className="row justify-content-center">
-                <div className="col-md-12 bg-theme-primary rounded-2 p-4">
+        <div className="container" style={{height: '100vh'}}>
+            <div className="row justify-content-center align-items-center" style={{height: '100%'}}>
+                <div className="col-lg-5 col-md-7 col-sm-12 bg-theme-primary rounded-2 p-4">
 
                     <div className="row mb-3">
                         <div className="col">
@@ -39,30 +39,27 @@ function Register() {
                     </div>
 
                     <div className="row">
-                        <div className="col-7 my-auto">
+                        <div className="col">
                             <form method="POST" onSubmit={handleSubmit} className="mb-3">
                                 <div className="mb-3">
-                                    <label htmlFor="email" className="form-label">Email address</label>
-                                    <input type="email" className="form-control" id="email" onChange={(e)=>setEmail(e.target.value)} />
+                                    <label htmlFor="email" className="form-label">Email</label>
+                                    <input type="email" className="form-control fw-bold" id="email" placeholder="example@example.com" onChange={(e)=>setEmail(e.target.value)} />
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="username" className="form-label">Username</label>
-                                    <input type="text" className="form-control" id="username" onChange={(e)=>setUsername(e.target.value)} />
+                                    <input type="text" className="form-control fw-bold" id="username" placeholder="example" onChange={(e)=>setUsername(e.target.value)} />
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="password" className="form-label">Password</label>
-                                    <input type="password" className="form-control" id="password" onChange={(e)=>setPassword(e.target.value)} />
+                                    <input type="password" className="form-control fw-bold" id="password" placeholder="********" onChange={(e)=>setPassword(e.target.value)} />
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="confirm_password" className="form-label">Confirm Password</label>
-                                    <input type="password" className="form-control" id="confirm_password" onChange={(e)=>setConfirmPassword(e.target.value)} />
+                                    <input type="password" className="form-control fw-bold" id="confirm_password" placeholder="********" onChange={(e)=>setConfirmPassword(e.target.value)} />
                                 </div>
                                 <button type="submit" className="btn btn-primary w-100">Register</button>
                             </form>
                             <span>Already have an account? <Link to="/login">Login now</Link></span>
-                        </div>
-                        <div className="col-5 d-flex align-items-center justify-content-center">
-                            <img src="/logo512.png" alt="" width='100%' className="img-fluid" />
                         </div>
                     </div>
 

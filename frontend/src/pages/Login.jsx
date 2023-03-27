@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [emailUsername, setEmailUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const navigate = useNavigate();
@@ -11,7 +11,7 @@ const Login = () => {
     const handleSubmit = async (e)=>{
         e.preventDefault();
 
-        const data = {email, password};
+        const data = {emailUsername, password};
 
         await axios.post('/api/auth/login', data)
             .then(res=>{
@@ -22,9 +22,9 @@ const Login = () => {
     }
 
     return (
-        <div className="container d-flex align-items-center justify-content-center" style={{height: '100vh'}}>
-            <div className="row justify-content-center">
-                <div className="col-md-12 bg-theme-primary rounded-2 p-4">
+        <div className="container" style={{height: '100vh'}}>
+            <div className="row justify-content-center align-items-center" style={{height: '100%'}}>
+                <div className="col-lg-5 col-md-7 col-sm-12 bg-theme-primary rounded-2 p-4">
 
                     <div className="row mb-3">
                         <div className="col">
@@ -33,22 +33,19 @@ const Login = () => {
                     </div>
 
                     <div className="row">
-                        <div className="col-7 my-auto">
+                        <div className="col">
                             <form method="POST" onSubmit={handleSubmit} className="mb-3">
                                 <div className="mb-3">
-                                    <label htmlFor="email" className="form-label">Email address</label>
-                                    <input type="email" className="form-control" id="email" onChange={(e)=>setEmail(e.target.value)} />
+                                    <label htmlFor="emailUsername" className="form-label">Email or Username</label>
+                                    <input type="text" className="form-control fw-bold" id="emailUsername" placeholder="example@example.com" onChange={(e)=>setEmailUsername(e.target.value)} />
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="password" className="form-label">Password</label>
-                                    <input type="password" className="form-control" id="password" onChange={(e)=>setPassword(e.target.value)} />
+                                    <input type="password" className="form-control fw-bold" id="password" placeholder="********" onChange={(e)=>setPassword(e.target.value)} />
                                 </div>
                                 <button type="submit" className="btn btn-primary w-100">Login</button>
                             </form>
                             <span>Dont have an account? <Link to="/register">Register here</Link></span>
-                        </div>
-                        <div className="col-5 d-flex align-items-center justify-content-center">
-                            <img src="/logo512.png" alt="" width='100%' className="img-fluid" />
                         </div>
                     </div>
 

@@ -37,13 +37,12 @@ const Home = ()=>{
     setOnline(people);
   }
 
-  const logout = ()=>{
-    axios.get('/api/auth/logout')
-      .then(res=>{
-        ws.close();
-        navigate('/login');
-      })
-      .catch(err=>console.error(err.response));
+  const selectConversation = (id)=>{
+    setSelectedConversation(id);
+
+    setTimeout(()=>{
+      inputEl.current?.focus();
+    }, 500)
   }
 
   const sendMessage = (e)=>{
@@ -62,12 +61,13 @@ const Home = ()=>{
     }
   }
 
-  const selectConversation = (id)=>{
-    setSelectedConversation(id);
-
-    setTimeout(()=>{
-      inputEl.current?.focus();
-    }, 500)
+  const logout = ()=>{
+    axios.get('/api/auth/logout')
+      .then(res=>{
+        ws.close();
+        navigate('/login');
+      })
+      .catch(err=>console.error(err.response));
   }
 
   const onlineExceptMe = {...online};
@@ -79,26 +79,20 @@ const Home = ()=>{
 
         {/* Contact */}
         <div className="col-lg-4 col-sm-6 contact p-0">
-          <div className='profile p-3'>
-            <img src={avatar} alt="" height='40px' />
-            <div className="dropdown">
-              <span className='cool-btn' data-bs-toggle="dropdown" aria-expanded="false">
-                <i className="fa-solid fa-ellipsis-vertical"></i>
-              </span>
-
-              <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                <li><span className="dropdown-item" onClick={logout} style={{cursor: 'pointer'}}>Log Out</span></li>
-              </ul>
-            </div>
+          <div className="header p-3">
+            <img src="/logo512.png" alt="" height='40px' />
+            <h3 className='fw-bold'>Chat App</h3>
           </div>
 
           <div className='contact-content'>
-
             {Object.keys(onlineExceptMe).map(id=>(
             <div className={`person-wrapper ${selectedConversation===id ? 'active' : ''}`} key={id}>
               <div className='cool-active'></div>
-              <div onClick={()=>selectConversation(id)} className={`person`}>
-                <img src={avatar} alt="" />
+              <div onClick={()=>selectConversation(id)} className='person'>
+                <div className='person-avatar'>
+                  <div className="online"></div>
+                  <img src={avatar} alt="" />
+                </div>
                 <div>
                   <span>{onlineExceptMe[id]}</span>
                   <span className='person-chat'>halooo</span>
@@ -106,7 +100,17 @@ const Home = ()=>{
               </div>
             </div>
             ))}
+          </div>
 
+          <div className='profile p-3'>
+            <div className='d-flex column-gap-2 align-items-center'>
+              <img src={avatar} alt="" height='40px' />
+              <span>{auth.username}</span>
+              <sup><i className="fa-solid fa-pen-to-square"></i></sup>
+            </div>
+            <div className='cool-btn' onClick={logout}>
+              <i className="fa-solid fa-right-from-bracket text-danger"></i>
+            </div>
           </div>
         </div>
 
@@ -126,8 +130,10 @@ const Home = ()=>{
 
           <div className='input p-3'>
             <form method="POST" onSubmit={sendMessage}>
-              <i className="fa-solid fa-paperclip"></i>
-              <input ref={inputEl} className='form-control' type="text" placeholder='Type your message' value={newMessage} onChange={(e)=>setNewMessage(e.target.value)} autoComplete="false" />
+              <button type='submit' className='cool-btn'>
+                <i className="fa-solid fa-paperclip"></i>
+              </button>
+              <input ref={inputEl} className='input-theme' type="text" placeholder='Type your message' value={newMessage} onChange={(e)=>setNewMessage(e.target.value)} autoComplete="false" />
               <button type='submit' className='cool-btn'>
                 <img src={send} alt=""  />
               </button>
@@ -137,8 +143,8 @@ const Home = ()=>{
           ) : (
           <>
           <div className='d-flex justify-content-center align-items-center flex-column gap-4' style={{height: '100%'}}>
-            <h1 style={{color: 'gray'}}>Select Conversation</h1>
             <i className="fa-solid fa-message text-center" style={{fontSize: '100px', color: 'gray'}}></i>
+            <h1 className='unselectable' style={{color: 'gray'}}>Start Conversation</h1>
           </div>
           </>
           )}

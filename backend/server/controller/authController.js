@@ -15,12 +15,16 @@ export const register = async (req, res)=>{
 }
 
 export const login = async (req, res)=>{
-    const { email, password } = req.body;
+    const { emailUsername, password } = req.body;
 
-    const user = await User.findOne({email});
+    let user = await User.findOne({email: emailUsername});
 
     if(!user){
-        return res.status(401).json({message: 'Bad Credentials'});
+        user = await User.findOne({username: emailUsername});
+
+        if(!user){
+            return res.status(401).json({message: 'Bad Credentials'});
+        }
     }
 
     // Check Password

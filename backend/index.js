@@ -63,6 +63,7 @@ wss.on('connection', (connection, req)=>{
         }
     }
 
+    // Message conversation
     connection.on('message', (message)=>{
         message = JSON.parse(message.toString());
         console.log(message)

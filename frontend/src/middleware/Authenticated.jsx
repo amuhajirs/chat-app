@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, Outlet } from "react-router-dom";
+import Loading from '../components/Loading';
 
 export default function Authenticated({type}) {
     const navigate = useNavigate();
     const [auth, setAuth] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(()=>{
         async function check(){
@@ -26,14 +28,15 @@ export default function Authenticated({type}) {
                     console.log(err.response);
                     setAuth(false);
                     return navigate('/login');
+                })
+                .finally(()=>{
+                    setIsLoading(false);
                 });
         }
 
         check();
     }, [navigate, type])
     return (
-        <>
-        {type==='auth' ? (auth && <Outlet context={auth} />) : (!auth && <Outlet />)}
-        </>
+        <>{isLoading ? <Loading /> : type==='auth' ? (auth && <Outlet context={auth} />) : (!auth && <Outlet />)}</>
     )
 }
