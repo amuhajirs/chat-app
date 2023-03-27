@@ -1,0 +1,162 @@
+:root {
+    --bg-primary: rgb(27, 27, 27);
+    --bg-hover: rgb(60, 60, 60);
+    --height: calc(100vh - 10px - 10px);
+}
+
+body {
+    background-color: black;
+    overflow: hidden;
+    padding: 10px;
+}
+
+h1, h2, h3, h4, h5, h6, p, i, span, label {
+    color: white;
+}
+
+.bg-theme-primary {
+    background-color: var(--bg-primary);
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Contact */
+.contact {
+    height: var(--height);
+    border-right: 1px solid gray;
+}
+
+.profile {
+    height: 70px;
+    box-shadow: 0px 10px 10px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 5px;
+}
+
+.contact-content {
+    height: calc(100% - 70px);
+    overflow-y: overlay;
+}
+
+.person {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 10px;
+    height: 80px;
+    padding: 10px;
+    border-bottom: 1px solid gray;
+    cursor: pointer;
+}
+
+.person:hover {
+    background-color: var(--bg-hover);
+}
+
+.person:active{
+    background-color: rgb(35, 35, 35);
+}
+
+.person-wrapper{
+    position: relative;
+}
+
+.person-wrapper.active > .person{
+    background-color: var(--bg-hover);
+}
+
+.person-wrapper.active>.cool-active{
+    z-index: 999;
+    position: absolute;
+    background-color: aqua;
+    height: 100%;
+    width: 4px;
+    left: 0;
+    border-radius: 0 7px 7px 0;
+}
+
+.person>img {
+    height: 100%;
+}
+
+.person>div {
+    padding-top: 5px;
+}
+
+.person-chat{
+    display: block;
+    font-size: 13px;
+    color: rgb(174, 174, 174);
+}
+
+/* End of Contact */
+
+/* Chat */
+.chat {
+    height: var(--height);
+}
+
+.recipient {
+    height: 70px;
+    box-shadow: 0px 10px 10px 0px;
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
+}
+
+.chat-content {
+    height: calc(100% - 70px - 70px);
+    overflow-y: overlay;
+}
+
+.chat-content>div {
+    height: 1000px;
+}
+
+.input {
+    height: 70px;
+    box-shadow: 0px -10px 10px 0px;
+}
+
+.input>form {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    height: 100%;
+}
+
+.input>form>i {
+    font-size: 20px;
+}
+
+.input>form>.cool-btn {
+    height: 100%;
+}
+.input>form img {
+    height: 55%;
+}
+
+/* End of Chat */
+
+.cool-btn {
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 15px;
+    padding-left: 15px;
+    aspect-ratio: 1/1;
+}
+
+.cool-btn:hover {
+    background-color: var(--bg-hover);
+}
