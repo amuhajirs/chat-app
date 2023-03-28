@@ -34,6 +34,7 @@ const Home = ()=>{
     return ()=>ws.close();
   }, []);
 
+  // Automatic scroll to bottom
   useEffect(()=>{
     chatContent.current?.scrollTo(0, chatContent.current.scrollHeight);
     inputEl.current?.focus();
