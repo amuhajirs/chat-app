@@ -13,6 +13,10 @@ h1, h2, h3, h4, h5, h6, p, i, span, label {
     color: white;
 }
 
+p{
+    margin: 0;
+}
+
 .bg-theme-primary {
     background-color: var(--bg-primary);
 }
@@ -151,8 +155,12 @@ h1, h2, h3, h4, h5, h6, p, i, span, label {
     overflow-y: overlay;
 }
 
-.chat-content>div {
-    height: 1000px;
+.chat-message{
+    background-color: blue;
+    width: fit-content;
+    padding: 6px 15px;
+    margin: 7px 15px;
+    border-radius: 20px;
 }
 
 .input {

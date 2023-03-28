@@ -14,6 +14,7 @@ import { fileURLToPath } from 'url';
 // Websocket
 import { WebSocketServer } from 'ws';
 import jwt from 'jsonwebtoken';
+import Message from './server/model/Message.js';
 
 // Set __filename and __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -45,7 +46,7 @@ const server = app.listen(port, () => {
 
 // WebSocket
 const wss = new WebSocketServer({server});
-wss.on('connection', (connection, req)=>{
+wss.on('connection', async (connection, req)=>{
 
     // read username and id from cookie
     const cookie = req.headers.cookie;
@@ -64,9 +65,22 @@ wss.on('connection', (connection, req)=>{
     }
 
     // Message conversation
-    connection.on('message', (message)=>{
+    connection.on('message', async (message)=>{
         message = JSON.parse(message.toString());
-        console.log(message)
+        console.log(message);
+        const {sender, recipient, text} = message;
+        const messageDoc = await Message.create({sender, recipient, text});
+
+        // Send message to recipient
+        [...wss.clients].filter(c=>c.id===recipient)
+            .forEach(c=>c.send(JSON.stringify({
+                message: {
+                    id: messageDoc._id,
+                    sender,
+                    recipient,
+                    text,
+                }
+            })));
     });
 
     // notify everyone about online people (when someone connect)

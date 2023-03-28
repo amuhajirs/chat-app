@@ -10,11 +10,13 @@ const Home = ()=>{
   const [online, setOnline] = useState({});
   const [selectedConversation, setSelectedConversation] = useState();
   const [newMessage, setNewMessage] = useState('');
+  const [messages, setMessages] = useState([]);
 
   const navigate = useNavigate();
   const inputEl = useRef();
+  const chatContent = useRef();
   const auth = useOutletContext();
-
+  
   useEffect(()=>{
     const ws = new WebSocket('ws://localhost:3001');
     setWs(ws);
@@ -23,12 +25,21 @@ const Home = ()=>{
       const data = JSON.parse(e.data);
       if('online' in data){
         showOnline(data.online);
+      } else if('message' in data){
+        setMessages(prev=>[...prev, {...data.message}]);
       }
     }
 
     ws.addEventListener('message', handleMessage);
+    return ()=>ws.close();
   }, []);
 
+  useEffect(()=>{
+    chatContent.current?.scrollTo(0, chatContent.current.scrollHeight);
+    inputEl.current?.focus();
+  }, [messages, selectedConversation])
+
+  // Show online people
   const showOnline = (peopleArray)=>{
     const people = {};
     peopleArray.forEach(({id, username})=>{
@@ -37,30 +48,36 @@ const Home = ()=>{
     setOnline(people);
   }
 
+  // Conversation (recipient id)
   const selectConversation = (id)=>{
     setSelectedConversation(id);
-
-    setTimeout(()=>{
-      inputEl.current?.focus();
-    }, 500)
   }
 
+  // Conversation (message)
+  const selectedConversationMessage = (id)=>{
+    const conversation = messages.filter(m=>m.sender===id || (m.sender===auth._id && m.recipient===id));
+    return conversation;
+  }
+
+  // Send message to recipient
   const sendMessage = (e)=>{
     e.preventDefault();
 
     if(newMessage){
-      ws.send(JSON.stringify({
-        message: {
-          sender: auth._id,
-          recipient: selectedConversation,
-          text: newMessage
-        }
-      }));
+      const myMessage = {
+        sender: auth._id,
+        recipient: selectedConversation,
+        text: newMessage
+      };
 
+      ws.send(JSON.stringify(myMessage));
+
+      setMessages(prev=>[...prev, myMessage]);
       setNewMessage('');
     }
   }
 
+  // Log out
   const logout = ()=>{
     axios.get('/api/auth/logout')
       .then(res=>{
@@ -81,7 +98,7 @@ const Home = ()=>{
         <div className="col-lg-4 col-sm-6 contact p-0">
           <div className="header p-3">
             <img src="/logo512.png" alt="" height='40px' />
-            <h3 className='fw-bold'>Chat App</h3>
+            <h4 className='fw-bold'>Chat App</h4>
           </div>
 
           <div className='contact-content'>
@@ -95,7 +112,10 @@ const Home = ()=>{
                 </div>
                 <div>
                   <span>{onlineExceptMe[id]}</span>
-                  <span className='person-chat'>halooo</span>
+                  <span className='person-chat'>
+                    {selectedConversationMessage(id)[0] ? selectedConversationMessage(id)[selectedConversationMessage(id).length-1].sender!==id && 'You: ' : ''}
+                    {selectedConversationMessage(id)[selectedConversationMessage(id).length-1]?.text}
+                  </span>
                 </div>
               </div>
             </div>
@@ -124,8 +144,14 @@ const Home = ()=>{
             <span>{online[selectedConversation]}</span>
           </div>
 
-          <div className="chat-content">
-            <div></div>
+          <div className="chat-content" ref={chatContent}>
+            <div className='my-3'>
+              {selectedConversationMessage(selectedConversation).map((m, index)=>(
+                <div className='chat-message' key={index} style={m.sender===auth._id ? {marginLeft: 'auto', background: 'white'} : {marginRight: 'auto'}}>
+                  <p className={`text-${m.sender===auth._id ? 'black' : 'white'}`}>{m.text}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className='input p-3'>
