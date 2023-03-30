@@ -45,8 +45,10 @@ p{
 }
 
 .contact-content {
+    background-color: black;
     height: calc(100% - 70px - 70px);
     overflow-y: overlay;
+    overflow-x: hidden;
 }
 
 .profile {
@@ -127,12 +129,16 @@ p{
 
 .person>div:not(.person-avatar) {
     padding-top: 5px;
+    overflow: hidden;
 }
 
 .person-chat{
     display: block;
     font-size: 13px;
     color: rgb(174, 174, 174);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* End of Contact */
@@ -151,16 +157,24 @@ p{
 }
 
 .chat-content {
+    background-color: black;
     height: calc(100% - 70px - 70px);
     overflow-y: overlay;
+    overflow-x: hidden;
 }
 
 .chat-message{
-    background-color: blue;
+    background-color: rgb(60, 60, 60);
     width: fit-content;
-    padding: 6px 15px;
+    max-width: 70%;
+    padding: 7px 15px;
     margin: 7px 15px;
     border-radius: 20px;
+    word-wrap: break-word;
+}
+
+.chat-message sub{
+    font-size: 12px;
 }
 
 .input {

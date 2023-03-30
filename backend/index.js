@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 config({path: '.env'})
 
 import authRoutes from './server/routes/authRoutes.js';
+import userRoutes from './server/routes/userRoutes.js';
 import './server/database/connection.js';
 import './server/config/cloudinary.js';
 
@@ -32,6 +33,7 @@ app.use(morgan('tiny'));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // FrontEnd / Static
 app.use(express.static(path.join(__dirname, './build')));
@@ -89,4 +91,32 @@ wss.on('connection', async (connection, req)=>{
             online: [...wss.clients].map(c=>({id: c.id, username: c.username}))
         }));
     });
+
+    // notify everyone about online people (when someone disconnect)
+    connection.on('close', ()=>{
+        [...wss.clients].forEach(client=>{
+            client.send(JSON.stringify({
+                online: [...wss.clients].map(c=>({id: c.id, username: c.username}))
+            }));
+        });
+    })
+
+    // Send history chat when connect
+    const messageDocs = await Message.find({
+        $or: [
+            {sender: connection.id},
+            {recipient: connection.id}
+        ]
+    }).sort({createdAt: 'asc'});
+
+    messageDocs.forEach(messageDoc=>{
+        connection.send(JSON.stringify({
+            message: {
+                sender: messageDoc.sender,
+                recipient: messageDoc.recipient,
+                text: messageDoc.text,
+                createdAt: messageDoc.createdAt,
+            }
+        }));
+    })
 });

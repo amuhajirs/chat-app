@@ -4,7 +4,7 @@ const Loading = () => {
 
     return (
         <div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}>
-            <BarLoader color="#ffffff" width='400px' />
+            <BarLoader color="#ffffff" width='40%' />
         </div>
     )
 }

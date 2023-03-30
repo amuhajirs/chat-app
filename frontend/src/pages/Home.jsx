@@ -1,13 +1,15 @@
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import avatar from '../assets/default-avatar.png';
+import moment from 'moment';
 
+import avatar from '../assets/default-avatar.png';
 import send from '../assets/send.svg';
 
 const Home = ()=>{
   const [ws, setWs] = useState('');
-  const [online, setOnline] = useState({});
+  const [online, setOnline] = useState([]);
+  const [offline, setOffline] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState();
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState([]);
@@ -18,21 +20,38 @@ const Home = ()=>{
   const auth = useOutletContext();
   
   useEffect(()=>{
-    const ws = new WebSocket('ws://localhost:3001');
+    const domain = process.env.NODE_ENV==='production' ? 'wss://jeremyjfn-chat.up.railway.app/' : 'ws://localhost:3001';
+    const ws = new WebSocket(`${domain}`);
     setWs(ws);
+    console.log('Connected to Websocket');
 
+    // Show online & offline people
+    const showPeople = async (dataOnline)=>{
+      const onlineExceptMe = dataOnline.filter(({id})=>id!==auth._id && id!==undefined);
+      setOnline(onlineExceptMe);
+
+      await axios.get('/api/users')
+        .then(res=>{
+          const users = res.data;
+          const offlinePeople = users.filter(user=>!dataOnline.find(({id})=>user._id===id));
+          setOffline(offlinePeople);
+        })
+    }
+
+    // Handle Message from websocket server
     const handleMessage = (e)=>{
       const data = JSON.parse(e.data);
       if('online' in data){
-        showOnline(data.online);
+        showPeople(data.online);
       } else if('message' in data){
         setMessages(prev=>[...prev, {...data.message}]);
       }
     }
 
     ws.addEventListener('message', handleMessage);
+
     return ()=>ws.close();
-  }, []);
+  }, [auth]);
 
   // Automatic scroll to bottom
   useEffect(()=>{
@@ -40,23 +59,9 @@ const Home = ()=>{
     inputEl.current?.focus();
   }, [messages, selectedConversation])
 
-  // Show online people
-  const showOnline = (peopleArray)=>{
-    const people = {};
-    peopleArray.forEach(({id, username})=>{
-      people[id] = username;
-    });
-    setOnline(people);
-  }
-
-  // Conversation (recipient id)
-  const selectConversation = (id)=>{
-    setSelectedConversation(id);
-  }
-
   // Conversation (message)
   const selectedConversationMessage = (id)=>{
-    const conversation = messages.filter(m=>m.sender===id || (m.sender===auth._id && m.recipient===id));
+    const conversation = messages.filter(m=>m.sender===id || m.recipient===id);
     return conversation;
   }
 
@@ -68,7 +73,8 @@ const Home = ()=>{
       const myMessage = {
         sender: auth._id,
         recipient: selectedConversation,
-        text: newMessage
+        text: newMessage,
+        createdAt: Date.now()
       };
 
       ws.send(JSON.stringify(myMessage));
@@ -81,15 +87,12 @@ const Home = ()=>{
   // Log out
   const logout = ()=>{
     axios.get('/api/auth/logout')
-      .then(res=>{
+      .then(()=>{
         ws.close();
         navigate('/login');
       })
       .catch(err=>console.error(err.response));
   }
-
-  const onlineExceptMe = {...online};
-  delete onlineExceptMe[auth._id];
 
   return (
     <div className='container-fluid bg-theme-primary rounded-2'>
@@ -103,19 +106,38 @@ const Home = ()=>{
           </div>
 
           <div className='contact-content'>
-            {Object.keys(onlineExceptMe).map(id=>(
-            <div className={`person-wrapper ${selectedConversation===id ? 'active' : ''}`} key={id}>
+            {online.map(onlinePerson=>(
+            <div className={`person-wrapper ${selectedConversation===onlinePerson.id ? 'active' : ''}`} key={onlinePerson.id}>
               <div className='cool-active'></div>
-              <div onClick={()=>selectConversation(id)} className='person'>
+              <div onClick={()=>setSelectedConversation(onlinePerson.id)} className='person'>
                 <div className='person-avatar'>
                   <div className="online"></div>
                   <img src={avatar} alt="" />
                 </div>
                 <div>
-                  <span>{onlineExceptMe[id]}</span>
+                  <span>{onlinePerson.username}</span>
                   <span className='person-chat'>
-                    {selectedConversationMessage(id)[0] ? selectedConversationMessage(id)[selectedConversationMessage(id).length-1].sender!==id && 'You: ' : ''}
-                    {selectedConversationMessage(id)[selectedConversationMessage(id).length-1]?.text}
+                    {selectedConversationMessage(onlinePerson.id)[0] ? selectedConversationMessage(onlinePerson.id)[selectedConversationMessage(onlinePerson.id).length-1].sender!==onlinePerson.id && 'You: ' : ''}
+                    {selectedConversationMessage(onlinePerson.id)[selectedConversationMessage(onlinePerson.id).length-1]?.text}
+                  </span>
+                </div>
+              </div>
+            </div>
+            ))}
+
+            {offline.map(offlinePerson=>(
+            <div className={`person-wrapper ${selectedConversation===offlinePerson._id ? 'active' : ''}`} key={offlinePerson._id}>
+              <div className='cool-active'></div>
+              <div onClick={()=>setSelectedConversation(offlinePerson._id)} className='person'>
+                <div className='person-avatar'>
+                  <div className="offline"></div>
+                  <img src={avatar} alt="" />
+                </div>
+                <div>
+                  <span>{offlinePerson.username}</span>
+                  <span className='person-chat'>
+                    {selectedConversationMessage(offlinePerson._id)[0] ? selectedConversationMessage(offlinePerson._id)[selectedConversationMessage(offlinePerson._id).length-1].sender!==offlinePerson._id && 'You: ' : ''}
+                    {selectedConversationMessage(offlinePerson._id)[selectedConversationMessage(offlinePerson._id).length-1]?.text}
                   </span>
                 </div>
               </div>
@@ -136,7 +158,7 @@ const Home = ()=>{
         </div>
 
         {/* Chat */}
-        <div className="col-lg-8 col-sm-6 chat p-0">
+        <div className="chat col-lg-8 col-sm-6 p-0">
 
           {selectedConversation ? (
           <>
@@ -146,10 +168,10 @@ const Home = ()=>{
           </div>
 
           <div className="chat-content" ref={chatContent}>
-            <div className='my-3'>
+            <div className='container my-3'>
               {selectedConversationMessage(selectedConversation).map((m, index)=>(
                 <div className='chat-message' key={index} style={m.sender===auth._id ? {marginLeft: 'auto', background: 'white'} : {marginRight: 'auto'}}>
-                  <p className={`text-${m.sender===auth._id ? 'black' : 'white'}`}>{m.text}</p>
+                  <p className={`text-${m.sender===auth._id ? 'black' : 'white'}`}>{m.text} <sub className={`text-${m.sender===auth._id ? 'black' : 'white'}`}>{moment(m.createdAt).format('HH:mm')}</sub></p>
                 </div>
               ))}
             </div>
