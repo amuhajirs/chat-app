@@ -8,6 +8,7 @@ import send from '../assets/send.svg';
 
 const Home = ()=>{
   const [ws, setWs] = useState('');
+  const [people, setPeople] = useState([]);
   const [online, setOnline] = useState([]);
   const [offline, setOffline] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState();
@@ -33,9 +34,11 @@ const Home = ()=>{
       await axios.get('/api/users')
         .then(res=>{
           const users = res.data;
+          setPeople(users);
           const offlinePeople = users.filter(user=>!dataOnline.find(({id})=>user._id===id));
           setOffline(offlinePeople);
         })
+        .catch(err=>console.error(err.response));
     }
 
     // Handle Message from websocket server
@@ -164,7 +167,7 @@ const Home = ()=>{
           <>
           <div className='recipient p-3'>
             <img src={avatar} alt="" height='40px' />
-            <span>{online[selectedConversation]}</span>
+            <span>{people.find(p=>p._id===selectedConversation)?.username}</span>
           </div>
 
           <div className="chat-content" ref={chatContent}>
