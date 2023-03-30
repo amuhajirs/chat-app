@@ -13,7 +13,7 @@ const userSchema = new Schema({
     },
     username: {
         type: String,
-        required: 'Username address is required',
+        required: 'Username is required',
         unique: true,
         trim: true,
         lowercase: true,
@@ -38,7 +38,7 @@ userSchema.pre('save', async function(){
     if(user.isModified('password')){
         user.password = await bcrypt.hash(user.password, salt);
     }
-})
+});
 
 const User = model('User', userSchema);
 

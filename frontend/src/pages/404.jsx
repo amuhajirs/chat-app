@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Custom404() {
-    const [count, setCount] = useState(10);
+    const [count, setCount] = useState(5);
 
     const navigate = useNavigate();
     useEffect(()=>{

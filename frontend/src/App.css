@@ -174,7 +174,7 @@ p{
 }
 
 .chat-message sub{
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .input {
@@ -225,6 +225,7 @@ p{
 }
 
 .cool-btn {
+    transition: all 200ms ease;
     cursor: pointer;
     border-radius: 50%;
     display: flex;
@@ -233,9 +234,11 @@ p{
     padding-right: 15px;
     padding-left: 15px;
     aspect-ratio: 1/1;
+    text-decoration: none;
 }
 
 .cool-btn:hover {
+    transition: all 200ms ease;
     background-color: var(--bg-hover);
 }
 

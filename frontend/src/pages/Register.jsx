@@ -8,11 +8,13 @@ function Register() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
 
     const handleSubmit = async (e)=>{
         e.preventDefault();
+        setIsLoading(true);
 
         if (confirmPassword===password){
             const data = {email, username, password};
@@ -22,9 +24,11 @@ function Register() {
                     console.log(res.data);
                     navigate('/login');
                 })
-                .catch(err=>console.error(err.response));
+                .catch(err=>console.error(err.response))
+                .finally(()=>setIsLoading(false));
         } else{
             alert('Confirm Password Wrong');
+            setIsLoading(false);
         }
     }
     return (
@@ -57,7 +61,8 @@ function Register() {
                                     <label htmlFor="confirm_password" className="form-label">Confirm Password</label>
                                     <input type="password" className="form-control fw-bold" id="confirm_password" placeholder="********" onChange={(e)=>setConfirmPassword(e.target.value)} />
                                 </div>
-                                <button type="submit" className="btn btn-primary w-100">Register</button>
+                                {!isLoading ? (<button type="submit" className="btn btn-primary w-100">Register</button>) :
+                                (<button type="submit" className="btn btn-primary w-100" disabled>Registering...</button>)}
                             </form>
                             <span>Already have an account? <Link to="/login">Login now</Link></span>
                         </div>

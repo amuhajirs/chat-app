@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import User from '../model/User.js';
 import bcrypt from 'bcrypt';
+import ResetPasswordEmail from '../config/resetPasswordEmail.js';
+import ResetToken from '../model/ResetToken.js';
 
 export const register = async (req, res)=>{
     const { email, username, password } = req.body;
@@ -47,6 +49,70 @@ export const login = async (req, res)=>{
         secure: process.env.NODE_ENV==='production',
     });
     res.json({message: 'Login Success'});
+}
+
+export const forgot = async (req, res)=>{
+    const {email} = req.body
+    const user = await User.findOne({email: email});
+
+    if(!user){
+        return res.json({message: 'Account not found'});
+    }
+
+    // Generate JWT Token
+    const token = jwt.sign(
+        {email: user.email,},
+        process.env.RESET_PASSWORD_KEY,
+        {expiresIn: '1h'}
+    );
+
+    try {
+        await ResetPasswordEmail(user.username, user.email, req.get('host'), token);
+        await ResetToken.create({token});
+    } catch (err) {
+        return res.status(500).json({message: 'yea'});
+    }
+
+    res.json({message: `link has been sent to ${email}`});
+}
+
+export const verify = async (req, res)=>{
+    const token = req.body.token;
+    const verify = await ResetToken.findOne({token});
+
+    if(token && verify){
+        try {
+            const decoded = jwt.verify(token, process.env.RESET_PASSWORD_KEY);
+            res.json({email: decoded.email});
+        } catch (err) {
+            res.status(400).json(false);
+        }
+    } else {
+        res.status(400).json(false);
+    }
+}
+
+export const reset = async (req, res)=>{
+    const {token, password} = req.body;
+    const verify = await ResetToken.findOne({token});
+
+    if(verify){
+        try {
+            const decoded = jwt.verify(token, process.env.RESET_PASSWORD_KEY);
+
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            await User.findOneAndUpdate({email: decoded.email}, {password: hashedPassword});
+
+            await verify.deleteOne();
+        } catch (error) {
+            return res.status(400).json({message: 'Invalid Token'});
+        }
+    } else{
+        return res.status(400).json({message: 'Invalid Token'});
+    }
+
+    res.json({message: 'Reset password success'});
 }
 
 export const logout = (req, res)=>{

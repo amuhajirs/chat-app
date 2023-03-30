@@ -194,7 +194,7 @@ const Home = ()=>{
           </>
           ) : (
           <>
-          <div className='d-flex justify-content-center align-items-center flex-column gap-4' style={{height: '100%'}}>
+          <div className='d-flex justify-content-center align-items-center flex-column gap-4' style={{height: '100%', backgroundColor: 'black'}}>
             <i className="fa-solid fa-message text-center" style={{fontSize: '100px', color: 'gray'}}></i>
             <h1 className='unselectable' style={{color: 'gray'}}>Start Conversation</h1>
           </div>

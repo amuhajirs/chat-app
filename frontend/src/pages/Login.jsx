@@ -5,11 +5,13 @@ import { useNavigate, Link } from "react-router-dom";
 const Login = () => {
     const [emailUsername, setEmailUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
 
     const handleSubmit = async (e)=>{
         e.preventDefault();
+        setIsLoading(true);
 
         const data = {emailUsername, password};
 
@@ -18,7 +20,8 @@ const Login = () => {
                 console.log(res.data);
                 navigate('/');
             })
-            .catch(err=>console.error(err.response));
+            .catch(err=>console.error(err.response))
+            .finally(()=>setIsLoading(false));
     }
 
     return (
@@ -42,8 +45,10 @@ const Login = () => {
                                 <div className="mb-3">
                                     <label htmlFor="password" className="form-label">Password</label>
                                     <input type="password" className="form-control fw-bold" id="password" placeholder="********" onChange={(e)=>setPassword(e.target.value)} />
+                                    <Link to="/forgot">Forgot your password?</Link>
                                 </div>
-                                <button type="submit" className="btn btn-primary w-100">Login</button>
+                                {!isLoading ? (<button type="submit" className="btn btn-primary w-100">Log In</button>) :
+                                (<button type="submit" className="btn btn-primary w-100" disabled>Logging In...</button>)}
                             </form>
                             <span>Dont have an account? <Link to="/register">Register here</Link></span>
                         </div>
