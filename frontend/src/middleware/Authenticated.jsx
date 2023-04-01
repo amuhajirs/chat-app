@@ -37,6 +37,6 @@ export default function Authenticated({type}) {
         check();
     }, [navigate, type])
     return (
-        <>{isLoading ? <Loading /> : type==='auth' ? (auth && <Outlet context={auth} />) : (!auth && <Outlet />)}</>
+        <>{isLoading ? <Loading /> : type==='auth' ? (auth && <Outlet context={{auth}} />) : (!auth && <Outlet />)}</>
     )
 }

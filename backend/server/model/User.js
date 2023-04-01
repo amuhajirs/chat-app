@@ -27,7 +27,10 @@ const userSchema = new Schema({
         required: 'Password is required',
         minLength: 8,
         trim: true
-    }
+    },
+    friends: [{
+        type: Schema.Types.ObjectId,
+    }],
 }, {timestamps:true, versionKey: false});
 
 userSchema.pre('save', async function(){

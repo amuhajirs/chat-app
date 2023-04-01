@@ -38,7 +38,7 @@ export const login = async (req, res)=>{
 
     // Generate JWT Token
     const token = jwt.sign(
-        {id: user._id, username: user.username},
+        {_id: user._id, username: user.username},
         process.env.JWT_KEY,
         {expiresIn: '1d'}
     );
@@ -130,7 +130,7 @@ export const loggedIn = async (req, res)=>{
     if(token){
         try {
             const decoded = jwt.verify(token, process.env.JWT_KEY);
-            const user = await User.findById(decoded.id).select('-password');
+            const user = await User.findById(decoded._id).select('-password');
             res.json({login: user});
         } catch (err) {
             res.json({login: false});

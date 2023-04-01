@@ -6,6 +6,7 @@ config({path: '.env'})
 
 import authRoutes from './server/routes/authRoutes.js';
 import userRoutes from './server/routes/userRoutes.js';
+import chatRoutes from './server/routes/chatRoutes.js';
 import './server/database/connection.js';
 import './server/config/cloudinary.js';
 
@@ -34,6 +35,7 @@ app.use(morgan('tiny'));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/chat', chatRoutes);
 
 // FrontEnd / Static
 app.use(express.static(path.join(__dirname, './build')));
@@ -58,7 +60,7 @@ wss.on('connection', async (connection, req)=>{
             const token = tokenString.split('=')[1];
             try {
                 const decoded = jwt.verify(token, process.env.JWT_KEY);
-                connection.id = decoded.id;
+                connection._id = decoded._id;
                 connection.username = decoded.username;
             } catch (err) {
                 throw err;
@@ -74,10 +76,10 @@ wss.on('connection', async (connection, req)=>{
         const messageDoc = await Message.create({sender, recipient, text});
 
         // Send message to recipient
-        [...wss.clients].filter(c=>c.id===recipient)
+        [...wss.clients].filter(c=>c._id===recipient || c._id===sender)
             .forEach(c=>c.send(JSON.stringify({
                 message: {
-                    id: messageDoc._id,
+                    _id: messageDoc._id,
                     sender,
                     recipient,
                     text,
@@ -88,7 +90,7 @@ wss.on('connection', async (connection, req)=>{
     // notify everyone about online people (when someone connect)
     [...wss.clients].forEach(client=>{
         client.send(JSON.stringify({
-            online: [...wss.clients].map(c=>({id: c.id, username: c.username}))
+            online: [...wss.clients].map(c=>({_id: c._id, username: c.username}))
         }));
     });
 
@@ -96,27 +98,8 @@ wss.on('connection', async (connection, req)=>{
     connection.on('close', ()=>{
         [...wss.clients].forEach(client=>{
             client.send(JSON.stringify({
-                online: [...wss.clients].map(c=>({id: c.id, username: c.username}))
+                online: [...wss.clients].map(c=>({_id: c._id, username: c.username}))
             }));
         });
-    })
-
-    // Send history chat when connect
-    const messageDocs = await Message.find({
-        $or: [
-            {sender: connection.id},
-            {recipient: connection.id}
-        ]
-    }).sort({createdAt: 'asc'});
-
-    messageDocs.forEach(messageDoc=>{
-        connection.send(JSON.stringify({
-            message: {
-                sender: messageDoc.sender,
-                recipient: messageDoc.recipient,
-                text: messageDoc.text,
-                createdAt: messageDoc.createdAt,
-            }
-        }));
-    })
+    });
 });

@@ -5,12 +5,17 @@ import './App.css';
 import Loading from './components/Loading';
 import Authenticated from './middleware/Authenticated';
 
-const Home = lazy(()=>import('./pages/Home'));
+import Rooms from './pages/Rooms';
+import Friends from './pages/Friends';
+import Notification from './pages/Notification';
+
 const Login = lazy(()=>import('./pages/Login'));
 const Register = lazy(()=>import('./pages/Register'));
 const Forgot = lazy(()=>import('./pages/Forgot'));
 const Reset = lazy(()=>import('./pages/Reset'));
 const Custom404 = lazy(()=>import('./pages/404'));
+
+const Home = lazy(()=>import('./layouts/Home'));
 
 function App() {
   return (
@@ -18,7 +23,11 @@ function App() {
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route element={<Authenticated type='auth' />}>
-            <Route path='/' element={<Home />} />
+            <Route element={<Home />}>
+              <Route path='/' element={<Rooms />} />
+              <Route path='/friends' element={<Friends />} />
+              <Route path='/notification' element={<Notification />} />
+            </Route>
           </Route>
           <Route element={<Authenticated type='guest' />}>
             <Route path='/login' element={<Login />} />
