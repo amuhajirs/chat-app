@@ -3,9 +3,11 @@ import User from "../model/User.js";
 export const allUsers = async (req, res)=>{
     const { search } = req.query;
 
-    const users = await User.find({username: {
-        $regex: search ? search : ''
-    }})
+    const users = await User.find({
+        username: {
+            $regex: search ? search : ''
+        }
+    })
         .select({_id: 1, username: 1, avatar: 1})
         .sort([['username', 'asc']]);
 
@@ -13,11 +15,17 @@ export const allUsers = async (req, res)=>{
 }
 
 export const getFriends = async (req, res)=>{
+    const { search } = req.query;
     const friends = req.user.friends;
 
-    const friendsDetail = await User.find({_id: {
-        $in: friends
-    }}).sort([['username', 'asc']]);
+    const friendsDetail = await User.find({
+        _id: {
+            $in: friends
+        },
+        username: {
+            $regex: search ? search : ''
+        }
+    }).sort([['username', 'asc']]);
 
     res.json({friends: friendsDetail});
 }

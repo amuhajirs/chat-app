@@ -1,22 +1,30 @@
 import axios from "axios";
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Link } from "react-router-dom";
 
 const Forgot = () => {
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const myModal = useRef();
+    
     const handleSubmit = async (e)=>{
         e.preventDefault();
-
+        
         setIsLoading(true);
         await axios.post('/api/auth/forgot', {email})
-            .then(res=>console.log(res.data))
+            .then((res)=>{
+                console.log(res.data);
+                const modal = new window.bootstrap.Modal(myModal.current);
+                modal.show();
+            })
             .catch(err=>console.error(err.response))
             .finally(()=>setIsLoading(false));
+        setIsLoading(false);
     }
 
     return (
+        <>
         <div className="container" style={{height: '100vh'}}>
             <Link to='/login' className="cool-btn bg-theme-primary" style={{position: 'absolute', top: '40px'}}>
                 <i className="fa-solid fa-arrow-left"></i>
@@ -51,7 +59,28 @@ const Forgot = () => {
                 </div>
             </div>
         </div>
+
+        {/* Modal */}
+        <div className="modal fade" id="successModal" tabIndex="-1" aria-hidden="true" ref={myModal} data-bs-theme="dark">
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h1 className="modal-title fs-5">Reset Link Sent</h1>
+                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div className="modal-body">
+                        <div className="mb-3">
+                            <p>Link has been sent successfully to <b>{email}</b>. Check your email now.</p>
+                        </div>
+                        <div className=" d-flex justify-content-end align-items-center pt-3">
+                            <a href="/login" type="button" className="btn btn-primary px-4">Okay</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </>
     )
 }
 
-export default Forgot
+export default Forgot;

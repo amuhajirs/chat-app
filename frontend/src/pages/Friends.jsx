@@ -3,14 +3,15 @@ import { useOutletContext } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 
 const Friends = () => {
-    const [search, setSearch] = useState('');
+    const [searchAdd, setSearchAdd] = useState('');
+    const [searchFriend, setSearchFriend] = useState('');
     const [result, setResult] = useState([]);
 
     const { auth, online, friends, setFriends, selectedConversation, setSelectedConversation, setMessages, setIsLoading } = useOutletContext();
-    const searchEl = useRef();
+    const searchAddEl = useRef();
 
-    const fetchFriends = async ()=>{
-        await axios.get('/api/users/friends')
+    const fetchFriends = async (search)=>{
+        await axios.get(`/api/users/friends${search ? `?search=${search}` : ''}`)
             .then(res=>{
                 const resFriends = res.data.friends;
 
@@ -48,8 +49,8 @@ const Friends = () => {
     const handleSubmit = async (e)=>{
         e.preventDefault();
 
-        if(search){
-            await axios.get(`/api/users?search=${search}`)
+        if(searchAdd){
+            await axios.get(`/api/users?search=${searchAdd}`)
                 .then(res=>setResult(res.data))
                 .catch(err=>console.error(err.response));
         } else{
@@ -73,9 +74,9 @@ const Friends = () => {
                     <label htmlFor="search" className='position-absolute top-50 unselectable' style={{left: '15px', translate: '0 -50%'}}>
                         <i className="fa-solid fa-magnifying-glass text-secondary" style={{fontSize: '15px'}}></i>
                     </label>
-                    <input type="search" id='search' className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} />
+                    <input type="search" id='search' className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} onChange={(e)=>fetchFriends(e.target.value)} />
                 </div>
-                <button className='cool-btn' data-bs-toggle="modal" data-bs-target="#addFriendModal" onClick={()=>setTimeout(()=>{searchEl.current?.focus()}, 500)}>
+                <button className='cool-btn' data-bs-toggle="modal" data-bs-target="#addFriendModal" onClick={()=>setTimeout(()=>{searchAddEl.current?.focus()}, 500)}>
                     <i className="fa-solid fa-user-plus unselectable" style={{fontSize: '15px'}}></i>
                 </button>
             </div>
@@ -98,21 +99,19 @@ const Friends = () => {
             {/* Modal */}
             <div className="modal fade" id="addFriendModal" tabIndex="-1" aria-hidden="true" data-bs-theme="dark">
                 <div className="modal-dialog modal-dialog-centered">
-                    <div className="modal-content bg-dark">
+                    <div className="modal-content bg-theme-primary">
                         <div className="modal-header">
                             <h1 className="modal-title fs-5">Add Friend</h1>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <form onSubmit={handleSubmit} className="d-flex gap-2">
+                            <form onSubmit={handleSubmit}>
                                 <div className='position-relative w-100'>
                                     <label htmlFor="search" className='position-absolute top-50 unselectable' style={{left: '15px', translate: '0 -50%'}}>
                                         <i className="fa-solid fa-magnifying-glass text-secondary" style={{fontSize: '15px'}}></i>
                                     </label>
-                                    <input type="search" id='search' ref={searchEl} className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} autoComplete="off" onChange={(e)=>setSearch(e.target.value)} />
+                                    <input type="search" id='search' ref={searchAddEl} className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} autoComplete="off" onChange={(e)=>setSearchAdd(e.target.value)} />
                                 </div>
-
-                                <button className="btn btn-primary">Search</button>
                             </form>
                             <hr className="text-white mb-0" />
                             {result[0] ? (result.map(user=>(
