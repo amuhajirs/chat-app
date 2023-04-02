@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 
 const Friends = () => {
     const [searchAdd, setSearchAdd] = useState('');
-    const [searchFriend, setSearchFriend] = useState('');
     const [result, setResult] = useState([]);
 
     const { auth, online, friends, setFriends, selectedConversation, setSelectedConversation, setMessages, setIsLoading } = useOutletContext();
@@ -61,6 +60,13 @@ const Friends = () => {
     const handleFriend = async (id)=>{
         await axios.patch('/api/users/friends/edit', {user: id})
             .then(res=>{
+                const oldFriends = auth.friends.find((friend)=>friend===id);
+                if(oldFriends){
+                    const newFriendList = auth.friends.filter((friend)=>friend!==id);
+                    auth.friends = newFriendList;
+                } else{
+                    auth.friends = [...auth.friends, id];
+                }
                 fetchFriends();
                 console.log(res.data);
             })
