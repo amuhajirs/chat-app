@@ -60,10 +60,8 @@ const Friends = () => {
     const handleFriend = async (id)=>{
         await axios.patch('/api/users/friends/edit', {user: id})
             .then(res=>{
-                const oldFriends = auth.friends.find((friend)=>friend===id);
-                if(oldFriends){
-                    const newFriendList = auth.friends.filter((friend)=>friend!==id);
-                    auth.friends = newFriendList;
+                if(auth.friends.includes(id)){
+                    auth.friends = auth.friends.filter((friend)=>friend!==id);
                 } else{
                     auth.friends = [...auth.friends, id];
                 }
