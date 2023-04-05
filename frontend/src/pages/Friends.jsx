@@ -51,7 +51,7 @@ const Friends = () => {
         if(searchAdd){
             await axios.get(`/api/users?search=${searchAdd}`)
                 .then(res=>setResult(res.data))
-                .catch(err=>console.error(err.response));
+                .catch(err=>console.herror(err.response));
         } else{
             setResult([]);
         }

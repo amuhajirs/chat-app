@@ -5,7 +5,8 @@ export const allUsers = async (req, res)=>{
 
     const users = await User.find({
         username: {
-            $regex: search ? search : ''
+            $regex: search ? search : '',
+            $options: 'i'
         }
     })
         .select({_id: 1, username: 1, avatar: 1})
@@ -23,9 +24,12 @@ export const getFriends = async (req, res)=>{
             $in: friends
         },
         username: {
-            $regex: search ? search : ''
+            $regex: search ? search : '',
+            $options: 'i'
         }
-    }).sort([['username', 'asc']]);
+    })
+        .select({_id: 1, username: 1, avatar: 1})
+        .sort([['username', 'asc']]);
 
     res.json({friends: friendsDetail});
 }
