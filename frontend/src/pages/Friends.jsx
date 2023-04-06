@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 const Friends = () => {
     const [searchAdd, setSearchAdd] = useState('');
     const [result, setResult] = useState([]);
+    const [friendResult, setFriendResult] = useState([]);
 
     const { auth, online, friends, setFriends, selectedConversation, setSelectedConversation, setMessages, setIsLoading } = useOutletContext();
     const searchAddEl = useRef();
@@ -28,6 +29,7 @@ const Friends = () => {
 
                 resFriends.sort((a, b)=>b.online - a.online);
                 setFriends(resFriends);
+                setFriendResult(resFriends);
             })
             .catch(err=>console.error(err.response));
     }
@@ -35,6 +37,11 @@ const Friends = () => {
     useEffect(()=>{
         fetchFriends();
     }, [online])
+
+    const searchFriends = (search)=>{
+        let re = new RegExp(search, 'i');
+        setFriendResult(friends.filter(friend=>friend.username.match(re)));
+    }
 
     const selectConversation = async (id)=>{
         setIsLoading(true);
@@ -78,14 +85,14 @@ const Friends = () => {
                     <label htmlFor="search" className='position-absolute top-50 unselectable' style={{left: '15px', translate: '0 -50%'}}>
                         <i className="fa-solid fa-magnifying-glass text-secondary" style={{fontSize: '15px'}}></i>
                     </label>
-                    <input type="search" id='search' className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} onChange={(e)=>fetchFriends(e.target.value)} />
+                    <input type="search" id='search' className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} onChange={(e)=>searchFriends(e.target.value)} />
                 </div>
                 <button className='cool-btn' data-bs-toggle="modal" data-bs-target="#addFriendModal" onClick={()=>setTimeout(()=>{searchAddEl.current?.focus()}, 500)}>
                     <i className="fa-solid fa-user-plus unselectable" style={{fontSize: '15px'}}></i>
                 </button>
             </div>
 
-            {friends.map(friend=>(
+            {friendResult.map(friend=>(
             <div className={`person-wrapper ${selectedConversation===friend._id ? 'active' : ''}`} key={friend._id}>
                 <div className='cool-active'></div>
                 <div onClick={()=>selectConversation(friend._id)} className='person'>
