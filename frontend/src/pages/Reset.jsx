@@ -64,17 +64,17 @@ const Reset = () => {
                                 <div className="mb-3">
                                     <p className="text-center">Enter your new password for <b>{email}</b></p>
                                 </div>
-                                <div className="mb-3">
-                                    <label htmlFor="newPassword" className="form-label">New Password</label>
-                                    <input type="password" className="form-control fw-bold" id="newPassword" placeholder="********" onChange={(e)=>setNewPassword(e.target.value)} />
+                                <div className="mb-4 field-theme">
+                                    <input type="password" className="input-theme rounded-pill" id="newPassword" onChange={(e)=>setNewPassword(e.target.value)} required />
+                                    <label htmlFor="newPassword">New Password</label>
                                 </div>
-                                <div className="mb-3">
-                                    <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-                                    <input type="password" className="form-control fw-bold" id="confirmPassword" placeholder="********" onChange={(e)=>setConfirmPassword(e.target.value)} />
+                                <div className="mb-4 field-theme">
+                                    <input type="password" className="input-theme rounded-pill" id="confirmPassword" onChange={(e)=>setConfirmPassword(e.target.value)} required />
+                                    <label htmlFor="confirmPassword">Confirm Password</label>
                                 </div>
                                 {!isLoading ? (
-                                <button type="submit" className="btn btn-primary w-100">Reset Password</button>) : (
-                                <button type="submit" className="btn btn-primary w-100" disabled>Resetting...</button>
+                                <button type="submit" className="btn btn-primary w-100 rounded-pill">Reset Password</button>) : (
+                                <button type="submit" className="btn btn-primary w-100 rounded-pill" disabled>Resetting...</button>
                                 )}
                             </form>
                         </div>

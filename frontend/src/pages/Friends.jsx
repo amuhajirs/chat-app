@@ -58,7 +58,7 @@ const Friends = () => {
         if(searchAdd){
             await axios.get(`/api/users?search=${searchAdd}`)
                 .then(res=>setResult(res.data))
-                .catch(err=>console.herror(err.response));
+                .catch(err=>console.error(err.response));
         } else{
             setResult([]);
         }
@@ -85,7 +85,7 @@ const Friends = () => {
                     <label htmlFor="search" className='position-absolute top-50 unselectable' style={{left: '15px', translate: '0 -50%'}}>
                         <i className="fa-solid fa-magnifying-glass text-secondary" style={{fontSize: '15px'}}></i>
                     </label>
-                    <input type="search" id='search' className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} onChange={(e)=>searchFriends(e.target.value)} />
+                    <input type="search" id='search' className='input-theme ps-5 rounded-pill' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} onChange={(e)=>searchFriends(e.target.value)} />
                 </div>
                 <button className='cool-btn' data-bs-toggle="modal" data-bs-target="#addFriendModal" onClick={()=>setTimeout(()=>{searchAddEl.current?.focus()}, 500)}>
                     <i className="fa-solid fa-user-plus unselectable" style={{fontSize: '15px'}}></i>

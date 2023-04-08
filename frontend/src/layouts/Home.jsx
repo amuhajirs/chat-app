@@ -84,7 +84,7 @@ const Home = ()=>{
 
             <div className='p-3'>
               <img src="/logo512.png" alt="" height='40px' />
-              <h4 className='fw-bold'>Chat App</h4>
+              <h4 className='fw-bold'>ChatApp</h4>
             </div>
 
             <div className='menu'>
@@ -145,7 +145,7 @@ const Home = ()=>{
               </div>
             </div>
 
-            <div className='input p-3'>
+            <div className='input-message p-3'>
               <form method="POST" onSubmit={sendMessage}>
                 <button type='submit' className='cool-btn'>
                   <i className="fa-solid fa-paperclip"></i>

@@ -44,13 +44,13 @@ const Forgot = () => {
                                 <div className="mb-3">
                                     <p className="text-center">Enter your email and we will send you a link via email to reset your password. <b>Dont</b> share it with anyone else.</p>
                                 </div>
-                                <div className="mb-3">
-                                    <label htmlFor="email" className="form-label">Email</label>
-                                    <input type="text" className="form-control fw-bold" id="email" placeholder="example@example.com" onChange={(e)=>setEmail(e.target.value)} />
+                                <div className="mb-3 field-theme">
+                                    <input type="text" className="input-theme rounded-pill" id="email" onChange={(e)=>setEmail(e.target.value)} required />
+                                    <label htmlFor="email">Email</label>
                                 </div>
                                 {!isLoading ? (
-                                <button type="submit" className="btn btn-primary w-100">Send Link</button>) : (
-                                <button type="submit" className="btn btn-primary w-100" disabled>Sending...</button>
+                                <button type="submit" className="btn btn-primary w-100 rounded-pill">Send Link</button>) : (
+                                <button type="submit" className="btn btn-primary w-100 rounded-pill" disabled>Sending...</button>
                                 )}
                             </form>
                         </div>
@@ -63,7 +63,7 @@ const Forgot = () => {
         {/* Modal */}
         <div className="modal fade" id="successModal" tabIndex="-1" aria-hidden="true" ref={myModal} data-bs-theme="dark">
             <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
+                <div className="modal-content bg-theme-primary">
                     <div className="modal-header">
                         <h1 className="modal-title fs-5">Reset Link Sent</h1>
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

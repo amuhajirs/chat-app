@@ -29,26 +29,32 @@ const Login = () => {
             <div className="row justify-content-center align-items-center" style={{height: '100%'}}>
                 <div className="col-lg-5 col-md-7 col-sm-12 bg-theme-primary rounded-2 p-4">
 
-                    <div className="row mb-3">
+                    <div className="row mb-4">
                         <div className="col">
-                            <h1 className="text-center fw-bold">Login</h1>
+                            <h1 className="text-center fw-bold mb-3">
+                                <img src="/logo512.png" style={{width: '60px'}} alt="" /> ChatApp
+                            </h1>
+                            <h4 className="text-center">Welcome Back :)</h4>
                         </div>
                     </div>
 
                     <div className="row">
                         <div className="col">
                             <form method="POST" onSubmit={handleSubmit} className="mb-3">
-                                <div className="mb-3">
-                                    <label htmlFor="emailUsername" className="form-label">Email or Username</label>
-                                    <input type="text" className="form-control fw-bold" id="emailUsername" placeholder="example@example.com" onChange={(e)=>setEmailUsername(e.target.value)} />
+                                <div className="mb-4 field-theme">
+                                    <input type="text" className="input-theme rounded-pill" id="emailUsername" onChange={(e)=>setEmailUsername(e.target.value)} required />
+                                    <label htmlFor="emailUsername">Email or Username</label>
+                                </div>
+                                <div className="mb-3 field-theme">
+                                    <input type="password" className="input-theme rounded-pill" id="password" onChange={(e)=>setPassword(e.target.value)} required />
+                                    <label htmlFor="password">Password</label>
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="password" className="form-label">Password</label>
-                                    <input type="password" className="form-control fw-bold" id="password" placeholder="********" onChange={(e)=>setPassword(e.target.value)} />
                                     <Link to="/forgot">Forgot your password?</Link>
                                 </div>
-                                {!isLoading ? (<button type="submit" className="btn btn-primary w-100">Log In</button>) :
-                                (<button type="submit" className="btn btn-primary w-100" disabled>Logging In...</button>)}
+
+                                {!isLoading ? (<button type="submit" className="btn btn-primary w-100 rounded-pill">Log In</button>) :
+                                (<button type="submit" className="btn btn-primary w-100 rounded-pill" disabled>Logging In...</button>)}
                             </form>
                             <span>Dont have an account? <Link to="/register">Register here</Link></span>
                         </div>
