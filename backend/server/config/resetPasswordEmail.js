@@ -24,7 +24,7 @@ let ResetPasswordEmail = async (name, email, host, token)=>{
     await transporter.sendMail({
         from: `"Chat App" <${process.env.SMTP_USERNAME}>`, // sender address
         to: email, // list of receivers
-        subject: 'Reset Password | Chat App', // Subject line
+        subject: 'Reset Password | ChatApp', // Subject line
         html: template  // html body
     });
 }
