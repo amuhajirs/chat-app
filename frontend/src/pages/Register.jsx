@@ -1,36 +1,61 @@
+import axios from "axios";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-
-import axios from "axios";
+import { useFormik } from "formik";
+import * as Yup from 'yup';
 
 function Register() {
-    const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
 
-    const handleSubmit = async (e)=>{
-        e.preventDefault();
-        setIsLoading(true);
+    // Validation schema
+    const registerSchema = Yup.object().shape({
+        email: Yup.string()
+            .required('Email required')
+            .email('Invalid Email'),
+        username: Yup.string()
+            .required('Username required')
+            .min(3, 'Username too short'),
+        password: Yup.string()
+            .required('Password required')
+            .min(8, 'Password too short'),
+        confirmPassword: Yup.string()
+            .required('Confirm Password required')
+            .oneOf([Yup.ref('password')], 'Your passwords do not match.')
+    });
 
-        if (confirmPassword===password){
-            const data = {email, username, password};
+    // Formik
+    const formik = useFormik({
+        initialValues: {
+            email: "",
+            username: "",
+            password: "",
+            confirmPassword: ""
+        },
+        validationSchema: registerSchema,
+        validateOnChange: false,
+        validateOnBlur: false,
+        onSubmit: async (values)=>{
+            setIsLoading(true);
 
-            await axios.post('/api/auth/register', data)
+            await axios.post('/api/auth/register', {
+                email: values.email,
+                username: values.username,
+                password: values.password
+            })
                 .then(res=>{
                     console.log(res.data);
                     navigate('/login');
                 })
-                .catch(err=>console.error(err.response))
+                .catch(err=>{
+                    formik.errors.email = err.response.data.error.email;
+                    formik.errors.username = err.response.data.error.username;
+                })
                 .finally(()=>setIsLoading(false));
-        } else{
-            alert('Confirm Password Wrong');
-            setIsLoading(false);
         }
-    }
+    });
+
     return (
         <div className="container" style={{height: '100vh'}}>
             <div className="row justify-content-center align-items-center" style={{height: '100%'}}>
@@ -47,23 +72,52 @@ function Register() {
 
                     <div className="row">
                         <div className="col">
-                            <form method="POST" onSubmit={handleSubmit} className="mb-3">
-                                <div className="mb-4 field-theme">
-                                    <input type="text" className="input-theme rounded-pill" id="email" onChange={(e)=>setEmail(e.target.value)} required />
-                                    <label htmlFor="email">Email</label>
-                                </div>
-                                <div className="mb-4 field-theme">
-                                    <input type="text" className="input-theme rounded-pill" id="username" onChange={(e)=>setUsername(e.target.value)} required />
-                                    <label htmlFor="username">Username</label>
-                                </div>
-                                <div className="mb-4 field-theme">
-                                    <input type="password" className="input-theme rounded-pill" id="password" onChange={(e)=>setPassword(e.target.value)} required />
-                                    <label htmlFor="password">Password</label>
-                                </div>
-                                <div className="mb-4 field-theme">
-                                    <input type="password" className="input-theme rounded-pill" id="confirm_password" onChange={(e)=>setConfirmPassword(e.target.value)} required />
-                                    <label htmlFor="confirm_password">Confirm Password</label>
-                                </div>
+                            <form method="POST" onSubmit={formik.handleSubmit} className="mb-3">
+
+                                    <div className="field-theme pb-4">
+                                        <input type="text"
+                                            {...formik.getFieldProps("email")}
+                                            className={`input-theme rounded-pill ${formik.errors.email && formik.touched.email ? 'invalid' : ''}`}
+                                            id="email"
+                                            required />
+
+                                        <label htmlFor="email">Email</label>
+                                        {formik.errors.email && formik.touched.email && <span className="error-message ms-3">{formik.errors.email}</span>}
+                                    </div>
+
+                                    <div className="field-theme pb-4">
+                                        <input type="text"
+                                            {...formik.getFieldProps("username")}
+                                            className={`input-theme rounded-pill ${formik.errors.username && formik.touched.username ? 'invalid' : ''}`}
+                                            id="username"
+                                            required />
+
+                                        <label htmlFor="username">Username</label>
+                                        {formik.errors.username && formik.touched.username && <span className="error-message ms-3">{formik.errors.username}</span>}
+                                    </div>
+
+                                    <div className="field-theme pb-4">
+                                        <input type="password"
+                                            {...formik.getFieldProps("password")}
+                                            className={`input-theme rounded-pill ${formik.errors.password && formik.touched.password ? 'invalid' : ''}`}
+                                            id="password"
+                                            required />
+
+                                        <label htmlFor="password">Password</label>
+                                        {formik.errors.password && formik.touched.password && <span className="error-message ms-3">{formik.errors.password}</span>}
+                                    </div>
+
+                                    <div className="field-theme pb-4">
+                                        <input type="password"
+                                            {...formik.getFieldProps("confirmPassword")}
+                                            className={`input-theme rounded-pill ${formik.errors.confirmPassword && formik.touched.confirmPassword ? 'invalid' : ''}`}
+                                            id="confirm_password"
+                                            required />
+
+                                        <label htmlFor="confirm_password">Confirm Password</label>
+                                        {formik.errors.confirmPassword && formik.touched.confirmPassword && <span className="error-message ms-3">{formik.errors.confirmPassword}</span>}
+                                    </div>
+
                                 {!isLoading ? (<button type="submit" className="btn btn-primary w-100 rounded-pill">Register</button>) :
                                 (<button type="submit" className="btn btn-primary w-100 rounded-pill" disabled>Registering...</button>)}
                             </form>

@@ -5,7 +5,7 @@
 
 .field-theme>label{
     position: absolute;
-    top: 50%;
+    top: 32%;
     left: 20px;
     translate: 0 -50%;
     cursor: text;
@@ -46,6 +46,18 @@
     color: white;
     border: none;
     outline: none;
+}
+
+.input-theme.invalid{
+    border: 1px solid red !important;
+}
+
+.error-message{
+    position: absolute;
+    color: red;
+    font-size: 12px;
+    left: 0;
+    bottom: 5px;
 }
 
 .input-theme:-webkit-autofill,

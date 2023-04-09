@@ -6,11 +6,22 @@ import ResetToken from '../model/ResetToken.js';
 
 export const register = async (req, res)=>{
     const { email, username, password } = req.body;
+    let error = {};
+
+    const checkEmail = await User.findOne({email});
+    const checkUsername = await User.findOne({username});
+
+    if(checkEmail){
+        error.email = 'Email already exists'
+    }
+    if(checkUsername){
+        error.username = 'Username already exists'
+    };
 
     try {
         await User.create({email, username, password});
     } catch (err) {
-        return res.status(400).json({message: err});
+        return res.status(400).json({error});
     }
 
     res.json({message: 'Register success'});

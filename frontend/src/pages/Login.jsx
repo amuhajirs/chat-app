@@ -6,6 +6,7 @@ const Login = () => {
     const [emailUsername, setEmailUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [badCredentials, setBadCredentials] = useState('');
 
     const navigate = useNavigate();
 
@@ -13,14 +14,12 @@ const Login = () => {
         e.preventDefault();
         setIsLoading(true);
 
-        const data = {emailUsername, password};
-
-        await axios.post('/api/auth/login', data)
+        await axios.post('/api/auth/login', {emailUsername, password})
             .then(res=>{
                 console.log(res.data);
                 navigate('/');
             })
-            .catch(err=>console.error(err.response))
+            .catch(()=>setBadCredentials('Username, Email or Password wrong'))
             .finally(()=>setIsLoading(false));
     }
 
@@ -41,13 +40,14 @@ const Login = () => {
                     <div className="row">
                         <div className="col">
                             <form method="POST" onSubmit={handleSubmit} className="mb-3">
-                                <div className="mb-4 field-theme">
+                                <div className="pb-4 field-theme">
                                     <input type="text" className="input-theme rounded-pill" id="emailUsername" onChange={(e)=>setEmailUsername(e.target.value)} required />
                                     <label htmlFor="emailUsername">Email or Username</label>
                                 </div>
-                                <div className="mb-3 field-theme">
+                                <div className="pb-4 field-theme">
                                     <input type="password" className="input-theme rounded-pill" id="password" onChange={(e)=>setPassword(e.target.value)} required />
                                     <label htmlFor="password">Password</label>
+                                    {badCredentials && <span className="error-message ms-3">{badCredentials}</span>}
                                 </div>
                                 <div className="mb-3">
                                     <Link to="/forgot">Forgot your password?</Link>
