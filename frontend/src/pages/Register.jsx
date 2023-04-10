@@ -79,7 +79,8 @@ function Register() {
                                             {...formik.getFieldProps("email")}
                                             className={`input-theme rounded-pill ${formik.errors.email && formik.touched.email ? 'invalid' : ''}`}
                                             id="email"
-                                            required />
+                                            required
+                                            autoComplete="off" />
 
                                         <label htmlFor="email">Email</label>
                                         {formik.errors.email && formik.touched.email && <span className="error-message ms-3">{formik.errors.email}</span>}
@@ -90,7 +91,8 @@ function Register() {
                                             {...formik.getFieldProps("username")}
                                             className={`input-theme rounded-pill ${formik.errors.username && formik.touched.username ? 'invalid' : ''}`}
                                             id="username"
-                                            required />
+                                            required
+                                            autoComplete="off" />
 
                                         <label htmlFor="username">Username</label>
                                         {formik.errors.username && formik.touched.username && <span className="error-message ms-3">{formik.errors.username}</span>}
@@ -101,7 +103,8 @@ function Register() {
                                             {...formik.getFieldProps("password")}
                                             className={`input-theme rounded-pill ${formik.errors.password && formik.touched.password ? 'invalid' : ''}`}
                                             id="password"
-                                            required />
+                                            required
+                                            autoComplete="off" />
 
                                         <label htmlFor="password">Password</label>
                                         {formik.errors.password && formik.touched.password && <span className="error-message ms-3">{formik.errors.password}</span>}
@@ -112,7 +115,8 @@ function Register() {
                                             {...formik.getFieldProps("confirmPassword")}
                                             className={`input-theme rounded-pill ${formik.errors.confirmPassword && formik.touched.confirmPassword ? 'invalid' : ''}`}
                                             id="confirm_password"
-                                            required />
+                                            required
+                                            autoComplete="off" />
 
                                         <label htmlFor="confirm_password">Confirm Password</label>
                                         {formik.errors.confirmPassword && formik.touched.confirmPassword && <span className="error-message ms-3">{formik.errors.confirmPassword}</span>}

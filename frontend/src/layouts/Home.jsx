@@ -75,99 +75,103 @@ const Home = ()=>{
   }
 
   return (
-    <div className='container-fluid bg-theme-primary rounded-2'>
-      <div className="row">
+    <div className='home-wrapper'>
+      <div className='container-fluid bg-theme-primary rounded-2'>
+        <div className="row">
 
-        {/* Contact */}
-        <div className="col-lg-3 col-md-4 col-sm-6 contact p-0">
-          <div className="header">
+          {/* Contact */}
+          <div className="col-lg-3 col-md-4 col-sm-6 contact p-0">
+            <div className="header">
 
-            <div className='p-3'>
-              <img src="/logo512.png" alt="" height='40px' />
-              <h4 className='fw-bold'>ChatApp</h4>
+              <div className='p-3'>
+                <img src="/logo512.png" alt="" height='40px' />
+                <h4 className='fw-bold'>ChatApp</h4>
+              </div>
+
+              <div className='menu'>
+                <NavLink to='/'>Rooms</NavLink>
+                <NavLink to='/friends'><i className="fa-solid fa-user-group"></i> Friends</NavLink>
+                <NavLink to='/notification' className='notif'><i className="fa-solid fa-bell"></i></NavLink>
+                <div className='line'></div>
+              </div>
+
             </div>
 
-            <div className='menu'>
-              <NavLink to='/'>Rooms</NavLink>
-              <NavLink to='/friends'><i className="fa-solid fa-user-group"></i> Friends</NavLink>
-              <NavLink to='/notification' className='notif'><i className="fa-solid fa-bell"></i></NavLink>
-              <div className='line'></div>
+            <div className='contact-content'>
+              <Outlet context={{auth, online, friends, setFriends, selectedConversation, setSelectedConversation, setMessages, setIsLoading}} />
             </div>
 
-          </div>
-
-          <div className='contact-content'>
-            <Outlet context={{auth, online, friends, setFriends, selectedConversation, setSelectedConversation, setMessages, setIsLoading}} />
-          </div>
-
-          <div className='profile p-3'>
-            <div className='d-flex column-gap-2 align-items-center'>
-              <img src={auth.avatar} alt="" height='40px' />
-              <span>{auth.username}</span>
-              <sup><i className="fa-solid fa-pen-to-square"></i></sup>
-            </div>
-            <div className='cool-btn' onClick={logout}>
-              <i className="fa-solid fa-right-from-bracket text-danger"></i>
-            </div>
-          </div>
-        </div>
-
-        {/* Chat */}
-        <div className="chat col-lg-9 col-md-8 col-sm-6 p-0">
-
-          {selectedConversation ? (
-            <>
-            <div className='recipient p-3'>
-              {!isLoading ? (
-                <>
-                  <img src={friends.find(p=>p._id===selectedConversation)?.avatar} alt="" height='40px' />
-                  <span>{friends.find(p=>p._id===selectedConversation)?.username}</span>
-                </>
-                ) : (
-                <>
-                  <img src='/default-avatar.png' alt="" height='40px' />
-                  <div className='w-100 placeholder-glow'>
-                    <span className='placeholder col-lg-1 col-3'></span>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="chat-content" ref={chatContent}>
-              <div className='container my-3'>
-                {!isLoading && (
-                  messages.map((m, index)=>(
-                    <div className='chat-message' key={index} style={m.sender===auth._id ? {marginLeft: 'auto', background: 'white'} : {marginRight: 'auto'}}>
-                      <p className={`text-${m.sender===auth._id ? 'black' : 'white'}`}>{m.text} <sub className={`text-${m.sender===auth._id ? 'black' : 'white'}`}>{moment(m.createdAt).format('HH:mm')}</sub></p>
-                    </div>
-                  ))
-                )}
+            <div className='profile p-3'>
+              <div className='d-flex column-gap-2 align-items-center'>
+                <img src={auth.avatar} alt="" height='40px' />
+                <span>{auth.username}</span>
+                <sup><i className="fa-solid fa-pen-to-square"></i></sup>
+              </div>
+              <div className='cool-btn' onClick={logout}>
+                <i className="fa-solid fa-right-from-bracket text-danger"></i>
               </div>
             </div>
+          </div>
 
-            <div className='input-message p-3'>
-              <form method="POST" onSubmit={sendMessage}>
-                <button type='submit' className='cool-btn'>
-                  <i className="fa-solid fa-paperclip"></i>
-                </button>
-                <input ref={inputEl} className='input-theme' type="text" placeholder='Type your message' value={newMessage} onChange={(e)=>setNewMessage(e.target.value)} autoComplete="false" />
-                <button type='submit' className='cool-btn'>
-                  <img src={send} alt=""  />
-                </button>
-              </form>
+          {/* Chat */}
+          <div className="chat col-lg-9 col-md-8 col-sm-6 p-0">
+
+            {selectedConversation ? (
+              <>
+              <div className='recipient p-3'>
+                {!isLoading ? (
+                  <>
+                    <img src={friends.find(p=>p._id===selectedConversation)?.avatar} alt="" height='40px' />
+                    <span>{friends.find(p=>p._id===selectedConversation)?.username}</span>
+                  </>
+                  ) : (
+                  <>
+                    <img src='/default-avatar.png' alt="" height='40px' />
+                    <div className='w-100 placeholder-glow'>
+                      <span className='placeholder col-lg-1 col-3'></span>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="chat-content" ref={chatContent}>
+                <div className='container my-3'>
+                  {!isLoading && (
+                    messages.filter(m=>m.sender===selectedConversation || m.recipient===selectedConversation).map((m, index)=>(
+                      <div className='chat-message' key={index} style={m.sender===auth._id ? {marginLeft: 'auto', background: 'white'} : {marginRight: 'auto'}}>
+                        <p className={`text-${m.sender===auth._id ? 'black' : 'white'}`}>
+                          {m.text} <sub className={`text-${m.sender===auth._id ? 'black' : 'white'}`}>{moment(m.createdAt).format('HH:mm')}</sub>
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className='input-message p-3'>
+                <form method="POST" onSubmit={sendMessage}>
+                  <button type='submit' className='cool-btn'>
+                    <i className="fa-solid fa-paperclip"></i>
+                  </button>
+                  <input ref={inputEl} className='input-theme' type="text" placeholder='Type your message' value={newMessage} onChange={(e)=>setNewMessage(e.target.value)} autoComplete="false" />
+                  <button type='submit' className='cool-btn'>
+                    <img src={send} alt=""  />
+                  </button>
+                </form>
+              </div>
+              </>
+            ) : (
+            <>
+            <div className='d-flex justify-content-center align-items-center flex-column gap-4' style={{height: '100%', backgroundColor: 'black'}}>
+              <i className="fa-solid fa-message text-center unselectable" style={{fontSize: '100px', color: 'gray'}}></i>
+              <h1 className='unselectable' style={{color: 'gray'}}>Start Conversation</h1>
             </div>
             </>
-          ) : (
-          <>
-          <div className='d-flex justify-content-center align-items-center flex-column gap-4' style={{height: '100%', backgroundColor: 'black'}}>
-            <i className="fa-solid fa-message text-center unselectable" style={{fontSize: '100px', color: 'gray'}}></i>
-            <h1 className='unselectable' style={{color: 'gray'}}>Start Conversation</h1>
+            )}
+
           </div>
-          </>
-          )}
 
         </div>
-
       </div>
     </div>
   )

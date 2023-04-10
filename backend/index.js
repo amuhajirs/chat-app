@@ -71,7 +71,6 @@ wss.on('connection', async (connection, req)=>{
     // Message conversation
     connection.on('message', async (message)=>{
         message = JSON.parse(message.toString());
-        console.log(message);
         const {sender, recipient, text} = message;
         const messageDoc = await Message.create({sender, recipient, text});
 

@@ -19,7 +19,7 @@ const Login = () => {
                 console.log(res.data);
                 navigate('/');
             })
-            .catch(()=>setBadCredentials('Username, Email or Password wrong'))
+            .catch(()=>setBadCredentials('Bad Credentials'))
             .finally(()=>setIsLoading(false));
     }
 
@@ -41,11 +41,11 @@ const Login = () => {
                         <div className="col">
                             <form method="POST" onSubmit={handleSubmit} className="mb-3">
                                 <div className="pb-4 field-theme">
-                                    <input type="text" className="input-theme rounded-pill" id="emailUsername" onChange={(e)=>setEmailUsername(e.target.value)} required />
+                                    <input type="text" className="input-theme rounded-pill" id="emailUsername" onChange={(e)=>setEmailUsername(e.target.value)} required autoComplete="off" />
                                     <label htmlFor="emailUsername">Email or Username</label>
                                 </div>
                                 <div className="pb-4 field-theme">
-                                    <input type="password" className="input-theme rounded-pill" id="password" onChange={(e)=>setPassword(e.target.value)} required />
+                                    <input type="password" className="input-theme rounded-pill" id="password" onChange={(e)=>setPassword(e.target.value)} required autoComplete="off" />
                                     <label htmlFor="password">Password</label>
                                     {badCredentials && <span className="error-message ms-3">{badCredentials}</span>}
                                 </div>
