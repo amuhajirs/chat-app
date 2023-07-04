@@ -118,10 +118,10 @@ const Friends = () => {
                         <div className="modal-body">
                             <form onSubmit={handleSubmit}>
                                 <div className='position-relative w-100'>
-                                    <label htmlFor="search" className='position-absolute top-50 unselectable' style={{left: '15px', translate: '0 -50%'}}>
+                                    <label htmlFor="search-add" className='position-absolute top-50 unselectable' style={{left: '15px', translate: '0 -50%'}}>
                                         <i className="fa-solid fa-magnifying-glass text-secondary" style={{fontSize: '15px'}}></i>
                                     </label>
-                                    <input type="search" id='search' ref={searchAddEl} className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} autoComplete="off" onChange={(e)=>setSearchAdd(e.target.value)} />
+                                    <input type="search" id='search-add' ref={searchAddEl} className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} autoComplete="off" onChange={(e)=>setSearchAdd(e.target.value)} />
                                 </div>
                             </form>
                             <hr className="text-white mb-0" />

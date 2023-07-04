@@ -1,7 +1,7 @@
 :root {
     --bg-primary: rgb(27, 27, 27);
     --bg-hover: rgb(60, 60, 60);
-    --height: calc(100vh - 20px - 20px);
+    --height: 100vh;
 }
 
 body {
@@ -26,10 +26,6 @@ p{
 
 ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.4);
-}
-
-.home-wrapper{
-    padding: 20px;
 }
 
 /* Contact */
@@ -256,13 +252,3 @@ p{
 }
 
 /* End of Chat */
-
-@media only screen and (max-width: 576px) {
-    :root{
-        --height: 100vh;
-    }
-
-    .home-wrapper{
-        padding: 0;
-    }
-}
