@@ -5,7 +5,7 @@ import Custom404 from "./404";
 
 const Reset = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [isInvalid, setIsInvalid] = useState(true);
+    const [isInvalid, setIsInvalid] = useState(false);
     const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');

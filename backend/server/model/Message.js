@@ -5,9 +5,9 @@ const messageSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    recipient: {
+    chat: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'Chat'
     },
     text: {
         type: String

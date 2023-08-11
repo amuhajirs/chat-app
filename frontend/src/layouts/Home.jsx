@@ -1,3 +1,4 @@
+import { io } from 'socket.io-client';
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useOutletContext, Outlet } from 'react-router-dom';
@@ -22,9 +23,10 @@ const Home = ()=>{
   
   useEffect(()=>{
     const domain = process.env.NODE_ENV==='production' ? 'wss://jeremyjfn-chat.up.railway.app/' : 'ws://localhost:3001';
-    const ws = new WebSocket(`${domain}`);
-    setWs(ws);
-    console.log('Connected to Websocket');
+    // const ws = new WebSocket(`${domain}`);
+    const io = io(domain);
+    setWs(io);
+    console.log(`Connected to Websocket, ID: ${ws.id}`);
 
     // Handle Message from websocket server
     const handleMessage = (e)=>{
@@ -38,7 +40,7 @@ const Home = ()=>{
 
     ws.addEventListener('message', handleMessage);
 
-    return ()=>ws.close();
+    // return ()=>ws.close();
   }, []);
 
   // Automatic scroll to bottom

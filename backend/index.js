@@ -1,4 +1,5 @@
 import express from 'express';
+import { Server } from 'socket.io'
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { config } from 'dotenv';
@@ -47,58 +48,67 @@ const server = app.listen(port, () => {
     console.log(`Server running on [http://localhost:${port}]...`);
 });
 
+const io = new Server(server, {
+    cors: '*'
+});
+
+io.on('connection', socket => {
+    console.log(socket.id);
+    
+});
 
 // WebSocket
-const wss = new WebSocketServer({server});
-wss.on('connection', async (connection, req)=>{
+// const wss = new WebSocketServer({server});
+// wss.on('connection', async (connection, req)=>{
 
-    // read username and id from cookie
-    const cookie = req.headers.cookie;
-    if(cookie){
-        const tokenString = cookie.split('; ').find(str=>str.startsWith('token='));
-        if(tokenString){
-            const token = tokenString.split('=')[1];
-            try {
-                const decoded = jwt.verify(token, process.env.JWT_KEY);
-                connection._id = decoded._id;
-                connection.username = decoded.username;
-            } catch (err) {
-                throw err;
-            }
-        }
-    }
+//     // read username and id from cookie
+//     const cookie = req.headers.cookie;
+//     if(cookie){
+//         const tokenString = cookie.split('; ').find(str=>str.startsWith('token='));
+//         if(tokenString){
+//             const token = tokenString.split('=')[1];
+//             try {
+//                 const decoded = jwt.verify(token, process.env.JWT_KEY);
+//                 connection._id = decoded._id;
+//                 connection.username = decoded.username;
+//             } catch (err) {
+//                 throw err;
+//             }
+//         }
+//     }
 
-    // Message conversation
-    connection.on('message', async (message)=>{
-        message = JSON.parse(message.toString());
-        const {sender, recipient, text} = message;
-        const messageDoc = await Message.create({sender, recipient, text});
+//     // Message conversation
+//     connection.on('message', async (message)=>{
+//         message = JSON.parse(message.toString());
+//         const {sender, recipient, text} = message;
+//         const messageDoc = await Message.create({sender, recipient, text});
 
-        // Send message to recipient
-        [...wss.clients].filter(c=>c._id===recipient || c._id===sender)
-            .forEach(c=>c.send(JSON.stringify({
-                message: {
-                    _id: messageDoc._id,
-                    sender,
-                    recipient,
-                    text,
-                }
-            })));
-    });
+//         // Send message to recipient
+//         [...wss.clients].filter(c=>c._id===recipient || c._id===sender)
+//             .forEach(c=>c.send(JSON.stringify({
+//                 message: {
+//                     _id: messageDoc._id,
+//                     sender,
+//                     recipient,
+//                     text,
+//                 }
+//             })));
+//     });
 
-    // notify everyone about online people (when someone connect)
-    [...wss.clients].forEach(client=>{
-        client.send(JSON.stringify({
-            online: [...wss.clients].map(c=>({_id: c._id, username: c.username}))
-        }));
-    });
+//     // notify everyone about online people (when someone connect)
+//     [...wss.clients].forEach(client=>{
+//         client.send(JSON.stringify({
+//             online: [...wss.clients].map(c=>({_id: c._id, username: c.username}))
+//         }));
+//     });
 
-    // notify everyone about online people (when someone disconnect)
-    connection.on('close', ()=>{
-        [...wss.clients].forEach(client=>{
-            client.send(JSON.stringify({
-                online: [...wss.clients].map(c=>({_id: c._id, username: c.username}))
-            }));
-        });
-    });
-});
+//     // notify everyone about online people (when someone disconnect)
+//     connection.on('close', ()=>{
+//         [...wss.clients].forEach(client=>{
+//             client.send(JSON.stringify({
+//                 online: [...wss.clients].map(c=>({_id: c._id, username: c.username}))
+//             }));
+//         });
+//     });
+// });
+

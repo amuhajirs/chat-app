@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import ResetPasswordEmail from '../config/resetPasswordEmail.js';
 import ResetToken from '../model/ResetToken.js';
 
+// POST /api/auth/register
 export const register = async (req, res)=>{
     const { email, username, password } = req.body;
     let error = {};
@@ -21,12 +22,13 @@ export const register = async (req, res)=>{
     try {
         await User.create({email, username, password});
     } catch (err) {
-        return res.status(400).json({error});
+        return res.status(400).json({message: error});
     }
 
     res.json({message: 'Register success'});
 }
 
+// POST /api/auth/login
 export const login = async (req, res)=>{
     const { emailUsername, password } = req.body;
 
@@ -62,6 +64,7 @@ export const login = async (req, res)=>{
     res.json({message: 'Login Success'});
 }
 
+// POST /api/auth/forgot
 export const forgot = async (req, res)=>{
     const {email} = req.body
     const user = await User.findOne({email: email});
@@ -81,12 +84,13 @@ export const forgot = async (req, res)=>{
         await ResetPasswordEmail(user.username, user.email, req.get('host'), token);
         await ResetToken.create({token});
     } catch (err) {
-        return res.status(500).json({message: 'yea'});
+        return res.status(500).json({message: err.message});
     }
 
     res.json({message: `link has been sent to ${email}`});
 }
 
+// POST /api/auth/verify
 export const verify = async (req, res)=>{
     const token = req.body.token;
     const verify = await ResetToken.findOne({token});
@@ -96,13 +100,14 @@ export const verify = async (req, res)=>{
             const decoded = jwt.verify(token, process.env.RESET_PASSWORD_KEY);
             res.json({email: decoded.email});
         } catch (err) {
-            res.status(400).json(false);
+            res.status(400).json({message: false});
         }
     } else {
-        res.status(400).json(false);
+        res.status(400).json({message: false});
     }
 }
 
+// POST /api/auth/reset
 export const reset = async (req, res)=>{
     const {token, password} = req.body;
     const verify = await ResetToken.findOne({token});
@@ -126,6 +131,7 @@ export const reset = async (req, res)=>{
     res.json({message: 'Reset password success'});
 }
 
+// GET /api/auth/logout
 export const logout = (req, res)=>{
     // Clear Cookie
     res.clearCookie('token', {
@@ -135,6 +141,7 @@ export const logout = (req, res)=>{
     res.json({message: 'Logged Out'});
 }
 
+// GET /api/auth/loggedin
 export const loggedIn = async (req, res)=>{
     const token = req.cookies.token;
 
