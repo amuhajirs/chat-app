@@ -9,20 +9,18 @@ import send from '../assets/send.svg';
 
 const Home = ()=>{
   const { user, setUser } = ChatState();
-  const [selectedConversation, setSelectedConversation] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedChat, setSelectedChat] = useState();
+  const [messageIsLoading, setMessageIsLoading] = useState(false);
   
   const navigate = useNavigate();
   const inputEl = useRef();
   const chatContent = useRef();
-  
-  console.log(user)
 
   // Automatic scroll to bottom
   useEffect(()=>{
     chatContent.current?.scrollTo(0, chatContent.current.scrollHeight);
     inputEl.current?.focus();
-  }, [selectedConversation]);
+  }, [selectedChat]);
 
   // Log out
   const logout = async ()=>{
@@ -57,7 +55,7 @@ const Home = ()=>{
           </div>
 
           <div className='contact-content'>
-            <Outlet context={{selectedConversation, setSelectedConversation, setIsLoading}} />
+            <Outlet context={{selectedChat, setSelectedChat, setMessageIsLoading}} />
           </div>
 
           <div className='profile p-3'>
@@ -72,16 +70,19 @@ const Home = ()=>{
           </div>
         </div>
 
-        {/* Chat */}
-        <div className="chat col-lg-9 col-md-8 col-sm-6 p-0">
+        {/* Messages */}
+        <div className="messages col-lg-9 col-md-8 col-sm-6 p-0">
 
-          {selectedConversation ? (
+          {selectedChat ? (
             <>
             <div className='recipient p-3'>
-              {!isLoading ? (
+              {!messageIsLoading ? (
                 <>
-                  <img src="" alt="" height='40px' />
-                  <span>bambang</span>
+                  <img src="/default-avatar.png" alt="" height='40px' />
+                  <span>{(selectedChat?.isGroupChat) ?
+                  (selectedChat?.chatName) : (selectedChat?.users[0].username===user.data?.username) ?
+                  (selectedChat?.users[1].username) : 
+                  (selectedChat?.users[0].username)}</span>
                 </>
                 ) : (
                 <>
@@ -93,14 +94,14 @@ const Home = ()=>{
               )}
             </div>
 
-            <div className="chat-content" ref={chatContent}>
+            <div className="messages-content" ref={chatContent}>
               <div className='container my-3'>
               </div>
             </div>
 
             <div className='input-message p-3'>
               <form method="POST">
-                <button type='submit' className='cool-btn'>
+                <button type='button' className='cool-btn'>
                   <i className="fa-solid fa-paperclip"></i>
                 </button>
                 <input ref={inputEl} className='input-theme' type="text" placeholder='Type your message' autoComplete="false" />

@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const ChatContext = createContext();
 
 const ChatProvider = ({children}) => {
-    const [user, setUser] = useState({username: 'anonymous'});
+    const [user, setUser] = useState({login: true});
 
     useEffect(() => {
         fetchUser()
@@ -16,6 +16,7 @@ const ChatProvider = ({children}) => {
                 setUser(res.data);
             })
             .catch(err => {
+                setUser({login: false});
                 console.error(err.response);
             })
     }

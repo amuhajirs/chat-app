@@ -32,19 +32,20 @@ export const register = async (req, res)=>{
 export const login = async (req, res)=>{
     const { emailUsername, password } = req.body;
 
-    let user = await User.findOne({email: emailUsername});
+    let user = await User.findOne({
+        $or: [
+            {email: emailUsername},
+            {username: emailUsername}
+        ]
+    }).populate('friends', ['-password', '-friends']);
 
     if(!user){
-        user = await User.findOne({username: emailUsername});
-
-        if(!user){
-            return res.status(401).json({message: 'Bad Credentials'});
-        }
+        return res.status(401).json({message: 'Bad Credentials'});
     }
 
     // Check Password
     const checkPassword = await bcrypt.compare(password, user.password);
-
+    
     if(!checkPassword){
         return res.status(401).json({message: 'Bad Credentials'});
     }
@@ -61,6 +62,9 @@ export const login = async (req, res)=>{
         httpOnly: true,
         secure: process.env.NODE_ENV==='production',
     });
+
+    user.password = undefined
+
     res.json({login: true, data: user});
 }
 
@@ -148,7 +152,10 @@ export const loggedIn = async (req, res)=>{
     if(token){
         try {
             const decoded = jwt.verify(token, process.env.JWT_KEY);
-            const user = await User.findById(decoded._id).select('-password');
+            const user = await User.findById(decoded._id)
+                .populate('friends', ['-password', '-friends'])
+                .select('-password');
+
             res.json({login: true, data: user});
         } catch (err) {
             res.json({login: false});

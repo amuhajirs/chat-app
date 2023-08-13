@@ -16,7 +16,6 @@ const Register = lazy(()=>import('./pages/Register'));
 const Forgot = lazy(()=>import('./pages/Forgot'));
 const Reset = lazy(()=>import('./pages/Reset'));
 const Custom404 = lazy(()=>import('./pages/404'));
-
 const Home = lazy(()=>import('./layouts/Home'));
 
 function App() {

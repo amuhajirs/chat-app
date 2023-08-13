@@ -6,9 +6,7 @@ export const allChats = async (req, res)=>{
     const chats = await Chat.find({
         users: { $in: req.user._id }
     })
-        .populate('latestMessage')
-        .populate('users', ['-password', '-friends'])
-        .populate('groupAdmin', ['-password', '-friends'])
+        .populate('latestMessage users groupAdmin', ['-password', '-friends'])
         .sort([['updatedAt', 'desc']]);
     res.json({data: chats});
 }
@@ -30,19 +28,20 @@ export const accessPersonalChat = async (req, res)=>{
                 {users: {$in: req.user._id}},
                 {users: {$in: userId}}
             ]
-        });
+        })
+            .populate('users', ['-password', '-friends']);
     } catch (err) {
-        return res.status(400).json({message: err.message})
+        return res.status(500).json({message: err.message})
     }
 
     if(chat) {
         return res.json({message: 'Chat already exist', data: chat})
     }
 
-    // If not exist, then create the chat
+    // If doesn't exist, then create the chat
     try {
-        await Chat.create({
-            chatName: 'test',
+        chat = await Chat.create({
+            chatName: 'Personal Chat',
             isGroupChat: false,
             users: [
                 req.user._id,
@@ -53,14 +52,15 @@ export const accessPersonalChat = async (req, res)=>{
         return res.status(500).json({message: err.message});
     }
 
-    res.json({message: 'New chat has been created'});
+    chat = await chat.populate('users', ['-password', '-friends']);
+
+    res.json({message: 'New chat has been created', data: chat});
 }
 
 // POST /api/chat/group
 export const createGroup = async (req, res)=>{
-    const { users, chatName, chatDesc } = req.body;
+    const { chatName, chatDesc, users } = req.body;
 
-    console.log(users.length)
     if(!users || !chatName) {
         return res.status(400).json({message: 'users and chatName field must be filled'});
     }
@@ -71,8 +71,10 @@ export const createGroup = async (req, res)=>{
 
     users.push(req.user._id);
 
+    let chat;
+
     try {
-        await Chat.create({
+        chat = await Chat.create({
             chatName: chatName,
             chatDesc: chatDesc || '',
             isGroupChat: true,
@@ -83,7 +85,12 @@ export const createGroup = async (req, res)=>{
         return res.status(500).json({message: err.message});
     }
 
-    res.json({message: 'Group Chat has been created'});
+    chat = await chat
+        .populate('users groupAdmin', ['-password', '-friends']);
+
+    console.log(chat)
+
+    res.json({message: 'Group Chat has been created', data: chat});
 }
 
 // PUT /api/group/:id/update
