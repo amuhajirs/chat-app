@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { ChatState } from "../context/ChatProvider";
 
 const Login = () => {
     const [emailUsername, setEmailUsername] = useState('');
@@ -9,14 +10,15 @@ const Login = () => {
     const [badCredentials, setBadCredentials] = useState('');
 
     const navigate = useNavigate();
+    const { setUser } = ChatState();
 
     const handleSubmit = async (e)=>{
         e.preventDefault();
         setIsLoading(true);
 
         await axios.post('/api/auth/login', {emailUsername, password})
-            .then(res=>{
-                console.log(res.data);
+            .then(res => {
+                setUser(res.data);
                 navigate('/');
             })
             .catch(()=>setBadCredentials('Bad Credentials'))

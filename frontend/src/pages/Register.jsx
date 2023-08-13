@@ -44,8 +44,7 @@ function Register() {
                 username: values.username,
                 password: values.password
             })
-                .then(res=>{
-                    console.log(res.data);
+                .then(()=>{
                     navigate('/login');
                 })
                 .catch(err=>{

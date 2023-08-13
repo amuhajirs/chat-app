@@ -7,28 +7,14 @@ const Friends = () => {
     const [result, setResult] = useState([]);
     const [friendResult, setFriendResult] = useState([]);
 
-    const { auth, online, friends, setFriends, selectedConversation, setSelectedConversation, setMessages, setIsLoading } = useOutletContext();
+    const { auth, selectedConversation, setSelectedConversation, setIsLoading } = useOutletContext();
     const searchAddEl = useRef();
 
     const fetchFriends = async (search)=>{
         await axios.get(`/api/users/friends${search ? `?search=${search}` : ''}`)
             .then(res=>{
-                const resFriends = res.data.friends;
-
-                resFriends.map(friend=>{
-                    friend.online = false;
-                    return(
-                        online.find(({_id})=>{
-                            if(friend._id===_id){
-                                friend.online=true;
-                            }
-                            return false;
-                        })
-                    )
-                });
-
+                const resFriends = res.data.data.friends;
                 resFriends.sort((a, b)=>b.online - a.online);
-                setFriends(resFriends);
                 setFriendResult(resFriends);
             })
             .catch(err=>console.error(err.response));
@@ -36,18 +22,18 @@ const Friends = () => {
 
     useEffect(()=>{
         fetchFriends();
-    }, [online])
+    }, []);
 
     const searchFriends = (search)=>{
         let re = new RegExp(search, 'i');
-        setFriendResult(friends.filter(friend=>friend.username.match(re)));
+        setFriendResult(friendResult.filter(friend=>friend.username.match(re)));
     }
 
     const selectConversation = async (id)=>{
         setIsLoading(true);
         setSelectedConversation(id);
         await axios.get(`/api/chat/history/${id}`)
-            .then(res=>setMessages(res.data.messages))
+            .then(res=>console.log(res.data.data.messages))
             .catch(err=>console.error(err.response))
             .finally(()=>setIsLoading(false));
     }
@@ -57,7 +43,7 @@ const Friends = () => {
 
         if(searchAdd){
             await axios.get(`/api/users?search=${searchAdd}`)
-                .then(res=>setResult(res.data))
+                .then(res=>setResult(res.data.data))
                 .catch(err=>console.error(err.response));
         } else{
             setResult([]);

@@ -61,7 +61,7 @@ export const login = async (req, res)=>{
         httpOnly: true,
         secure: process.env.NODE_ENV==='production',
     });
-    res.json({message: 'Login Success'});
+    res.json({login: true, data: user});
 }
 
 // POST /api/auth/forgot
@@ -149,7 +149,7 @@ export const loggedIn = async (req, res)=>{
         try {
             const decoded = jwt.verify(token, process.env.JWT_KEY);
             const user = await User.findById(decoded._id).select('-password');
-            res.json({login: user});
+            res.json({login: true, data: user});
         } catch (err) {
             res.json({login: false});
         }

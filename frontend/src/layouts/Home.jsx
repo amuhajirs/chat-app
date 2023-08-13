@@ -1,76 +1,34 @@
-import { io } from 'socket.io-client';
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useOutletContext, Outlet } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
-import moment from 'moment';
+
+import { ChatState } from '../context/ChatProvider';
 
 import send from '../assets/send.svg';
 
 const Home = ()=>{
-  const [ws, setWs] = useState('');
-  const [friends, setFriends] = useState([]);
-  const [online, setOnline] = useState([]);
+  const { user, setUser } = ChatState();
   const [selectedConversation, setSelectedConversation] = useState();
-  const [newMessage, setNewMessage] = useState('');
-  const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  
   const navigate = useNavigate();
   const inputEl = useRef();
   const chatContent = useRef();
-  const { auth } = useOutletContext();
   
-  useEffect(()=>{
-    const domain = process.env.NODE_ENV==='production' ? 'wss://jeremyjfn-chat.up.railway.app/' : 'ws://localhost:3001';
-    // const ws = new WebSocket(`${domain}`);
-    const io = io(domain);
-    setWs(io);
-    console.log(`Connected to Websocket, ID: ${ws.id}`);
-
-    // Handle Message from websocket server
-    const handleMessage = (e)=>{
-      const data = JSON.parse(e.data);
-      if('online' in data){
-        setOnline(data.online);
-      } else if('message' in data){
-        setMessages(prev=>[...prev, {...data.message}]);
-      }
-    }
-
-    ws.addEventListener('message', handleMessage);
-
-    // return ()=>ws.close();
-  }, []);
+  console.log(user)
 
   // Automatic scroll to bottom
   useEffect(()=>{
     chatContent.current?.scrollTo(0, chatContent.current.scrollHeight);
     inputEl.current?.focus();
-  }, [messages, selectedConversation]);
-
-  // Send message to recipient
-  const sendMessage = (e)=>{
-    e.preventDefault();
-
-    if(newMessage){
-      const myMessage = {
-        sender: auth._id,
-        recipient: selectedConversation,
-        text: newMessage,
-        createdAt: Date.now()
-      };
-
-      ws.send(JSON.stringify(myMessage));
-      setNewMessage('');
-    }
-  }
+  }, [selectedConversation]);
 
   // Log out
   const logout = async ()=>{
     await axios.get('/api/auth/logout')
       .then(()=>{
-        ws.close();
+        setUser({login: false});
         navigate('/login');
       })
       .catch(err=>console.error(err.response));
@@ -90,7 +48,7 @@ const Home = ()=>{
             </div>
 
             <div className='menu'>
-              <NavLink to='/'>Rooms</NavLink>
+              <NavLink to='/'><i className="fa-solid fa-comment"></i> Chats</NavLink>
               <NavLink to='/friends'><i className="fa-solid fa-user-group"></i> Friends</NavLink>
               <NavLink to='/notification' className='notif'><i className="fa-solid fa-bell"></i></NavLink>
               <div className='line'></div>
@@ -99,13 +57,13 @@ const Home = ()=>{
           </div>
 
           <div className='contact-content'>
-            <Outlet context={{auth, online, friends, setFriends, selectedConversation, setSelectedConversation, setMessages, setIsLoading}} />
+            <Outlet context={{selectedConversation, setSelectedConversation, setIsLoading}} />
           </div>
 
           <div className='profile p-3'>
             <div className='d-flex column-gap-2 align-items-center'>
-              <img src={auth.avatar} alt="" height='40px' />
-              <span>{auth.username}</span>
+              <img src={user.data?.avatar} alt="" height='40px' />
+              <span>{user.data?.username}</span>
               <sup><i className="fa-solid fa-pen-to-square"></i></sup>
             </div>
             <div className='cool-btn' onClick={logout}>
@@ -122,8 +80,8 @@ const Home = ()=>{
             <div className='recipient p-3'>
               {!isLoading ? (
                 <>
-                  <img src={friends.find(p=>p._id===selectedConversation)?.avatar} alt="" height='40px' />
-                  <span>{friends.find(p=>p._id===selectedConversation)?.username}</span>
+                  <img src="" alt="" height='40px' />
+                  <span>bambang</span>
                 </>
                 ) : (
                 <>
@@ -137,24 +95,15 @@ const Home = ()=>{
 
             <div className="chat-content" ref={chatContent}>
               <div className='container my-3'>
-                {!isLoading && (
-                  messages.filter(m=>m.sender===selectedConversation || m.recipient===selectedConversation).map((m, index)=>(
-                    <div className='chat-message' key={index} style={m.sender===auth._id ? {marginLeft: 'auto', background: 'white'} : {marginRight: 'auto'}}>
-                      <p className={`text-${m.sender===auth._id ? 'black' : 'white'}`}>
-                        {m.text} <sub className={`text-${m.sender===auth._id ? 'black' : 'white'}`}>{moment(m.createdAt).format('HH:mm')}</sub>
-                      </p>
-                    </div>
-                  ))
-                )}
               </div>
             </div>
 
             <div className='input-message p-3'>
-              <form method="POST" onSubmit={sendMessage}>
+              <form method="POST">
                 <button type='submit' className='cool-btn'>
                   <i className="fa-solid fa-paperclip"></i>
                 </button>
-                <input ref={inputEl} className='input-theme' type="text" placeholder='Type your message' value={newMessage} onChange={(e)=>setNewMessage(e.target.value)} autoComplete="false" />
+                <input ref={inputEl} className='input-theme' type="text" placeholder='Type your message' autoComplete="false" />
                 <button type='submit' className='cool-btn'>
                   <img src={send} alt=""  />
                 </button>

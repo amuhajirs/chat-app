@@ -44,7 +44,7 @@ const Forgot = () => {
                                 <div className="mb-3">
                                     <p className="text-center">Enter your email and we will send you a link via email to reset your password. <b>Dont</b> share it with anyone else.</p>
                                 </div>
-                                <div className="mb-3 field-theme">
+                                <div className="pb-4 field-theme">
                                     <input type="text" className="input-theme rounded-pill" id="email" onChange={(e)=>setEmail(e.target.value)} required />
                                     <label htmlFor="email">Email</label>
                                 </div>

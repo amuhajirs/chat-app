@@ -1,4 +1,4 @@
-const Rooms = () => {
+const Chats = () => {
     return (
         <div className='search d-flex justify-content-between align-items-center px-2 py-2 gap-1' style={{height: '60px'}}>
             <div className='position-relative w-100'>
@@ -14,4 +14,4 @@ const Rooms = () => {
     )
 }
 
-export default Rooms;
+export default Chats;
