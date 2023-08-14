@@ -14,10 +14,8 @@ import './server/config/cloudinary.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Websocket
-import { WebSocketServer } from 'ws';
-import jwt from 'jsonwebtoken';
-import Message from './server/model/Message.js';
+// import jwt from 'jsonwebtoken';
+// import Message from './server/model/Message.js';
 
 // Set __filename and __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -48,67 +46,24 @@ const server = app.listen(port, () => {
     console.log(`Server running on [http://localhost:${port}]...`);
 });
 
+// WebSocket
 const io = new Server(server, {
-    cors: '*'
+    pingTimeout: 60000,
+    cors: {
+        origin: '*'
+    }
 });
 
 io.on('connection', socket => {
-    console.log(socket.id);
-    
+    console.log(`${socket.id} connected`);
+
+    socket.on('join all chats', chatsId => {
+        socket.join(chatsId);
+        console.log('User has joined the room:', chatsId);
+    });
+
+    socket.on('send message', message => {
+        console.log(message);
+        io.in(message.chat).emit('receive message', message);
+    });
 });
-
-// WebSocket
-// const wss = new WebSocketServer({server});
-// wss.on('connection', async (connection, req)=>{
-
-//     // read username and id from cookie
-//     const cookie = req.headers.cookie;
-//     if(cookie){
-//         const tokenString = cookie.split('; ').find(str=>str.startsWith('token='));
-//         if(tokenString){
-//             const token = tokenString.split('=')[1];
-//             try {
-//                 const decoded = jwt.verify(token, process.env.JWT_KEY);
-//                 connection._id = decoded._id;
-//                 connection.username = decoded.username;
-//             } catch (err) {
-//                 throw err;
-//             }
-//         }
-//     }
-
-//     // Message conversation
-//     connection.on('message', async (message)=>{
-//         message = JSON.parse(message.toString());
-//         const {sender, recipient, text} = message;
-//         const messageDoc = await Message.create({sender, recipient, text});
-
-//         // Send message to recipient
-//         [...wss.clients].filter(c=>c._id===recipient || c._id===sender)
-//             .forEach(c=>c.send(JSON.stringify({
-//                 message: {
-//                     _id: messageDoc._id,
-//                     sender,
-//                     recipient,
-//                     text,
-//                 }
-//             })));
-//     });
-
-//     // notify everyone about online people (when someone connect)
-//     [...wss.clients].forEach(client=>{
-//         client.send(JSON.stringify({
-//             online: [...wss.clients].map(c=>({_id: c._id, username: c.username}))
-//         }));
-//     });
-
-//     // notify everyone about online people (when someone disconnect)
-//     connection.on('close', ()=>{
-//         [...wss.clients].forEach(client=>{
-//             client.send(JSON.stringify({
-//                 online: [...wss.clients].map(c=>({_id: c._id, username: c.username}))
-//             }));
-//         });
-//     });
-// });
-

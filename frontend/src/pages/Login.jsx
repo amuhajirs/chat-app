@@ -10,7 +10,7 @@ const Login = () => {
     const [badCredentials, setBadCredentials] = useState('');
 
     const navigate = useNavigate();
-    const { setUser } = ChatState();
+    const { setUser, setFriends } = ChatState();
 
     const handleSubmit = async (e)=>{
         e.preventDefault();
@@ -18,6 +18,8 @@ const Login = () => {
 
         await axios.post('/api/auth/login', {emailUsername, password})
             .then(res => {
+                setFriends(res.data.data.friends);
+                delete res.data.data.friends;
                 setUser(res.data);
                 navigate('/');
             })

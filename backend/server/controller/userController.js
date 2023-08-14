@@ -39,6 +39,12 @@ export const editFriends = async (req, res)=>{
     const myUser = req.user;
     const { userId } = req.body;
 
+    const user = await User.findById(userId);
+
+    if(!user) {
+        return res.status(400).json({message: 'No user found'});
+    }
+
     if(userId!==myUser._id.toString()){
         // Add friend
         if(!myUser.friends.includes(userId)){
@@ -47,7 +53,7 @@ export const editFriends = async (req, res)=>{
             } catch (err) {
                 return res.status(400).json({message: err.message});
             }
-            return res.json({message: 'User added to friendlist'});
+            return res.json({message: 'User added to friendlist', data: user});
         }
     
         // Remove friend
@@ -57,7 +63,7 @@ export const editFriends = async (req, res)=>{
             } catch (error) {
                 return res.status(400).json({message: err.message});
             }
-            return res.json({message: 'User removed from friendlist'});
+            return res.json({message: 'User removed from friendlist', data: user});
         }
     } 
 

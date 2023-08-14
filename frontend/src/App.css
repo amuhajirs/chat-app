@@ -91,7 +91,7 @@ p{
 .contact-content {
     background-color: black;
     height: calc(100% - 70px - 40px - 70px);
-    overflow-y: overlay;
+    overflow-y: scroll;
     overflow-x: hidden;
 }
 
@@ -239,12 +239,18 @@ p{
 
 .message{
     background-color: rgb(60, 60, 60);
+    color: white;
     width: fit-content;
     max-width: 70%;
     padding: 7px 15px;
-    margin: 7px 15px;
     border-radius: 20px;
     word-wrap: break-word;
+}
+
+.message.me {
+    margin-left: auto !important;
+    background-color: white;
+    color: rgb(60, 60, 60);
 }
 
 .message sub{

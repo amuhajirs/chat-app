@@ -2,25 +2,45 @@ import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
+import { io } from 'socket.io-client'
 
 import { ChatState } from '../context/ChatProvider';
+import ChatContent from '../components/ChatContent';
 
 import send from '../assets/send.svg';
 
 const Home = ()=>{
-  const { user, setUser } = ChatState();
+  const { user, setUser, chats, setChats } = ChatState();
+  const [socket, setSocket] = useState(undefined)
   const [selectedChat, setSelectedChat] = useState();
   const [messageIsLoading, setMessageIsLoading] = useState(false);
-  
+
   const navigate = useNavigate();
   const inputEl = useRef();
-  const chatContent = useRef();
 
-  // Automatic scroll to bottom
-  useEffect(()=>{
-    chatContent.current?.scrollTo(0, chatContent.current.scrollHeight);
-    inputEl.current?.focus();
-  }, [selectedChat]);
+  useEffect(() => {
+    const newSocket = io('ws://localhost:3001');
+    newSocket.on('connect', () => {
+      console.log('connected to socket.io');
+      setSocket(newSocket);
+    });
+  }, []);
+
+  useEffect(() => {
+    const chatsId = chats.map(c=>c._id)
+    socket?.emit('join all chats', chatsId);
+
+    socket?.on('receive message', newMessage => {
+      const updatedChats = chats.map(c => {
+          if (c._id===newMessage.chat) {
+              c.latestMessage = newMessage;
+          }
+          return c;
+      });
+
+      setChats(updatedChats);
+  });
+  }, [chats]);
 
   // Log out
   const logout = async ()=>{
@@ -30,6 +50,36 @@ const Home = ()=>{
         navigate('/login');
       })
       .catch(err=>console.error(err.response));
+  }
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+
+    if(!inputEl.current.value.trim()){
+      return
+    }
+
+    const message = {
+      sender: user.data,
+      chat: selectedChat._id,
+      text: inputEl.current.value
+    }
+
+    inputEl.current.value = "";
+
+    socket?.emit('send message', message);
+
+    const updatedChats = chats.map(c => {
+      if (c._id===message.chat) {
+        c.latestMessage = message;
+      }
+      return c;
+    });
+
+    setChats(updatedChats);
+
+    await axios.post('/api/chat/send', message)
+      .catch(err => console.error(err.response));
   }
 
   return (
@@ -55,7 +105,7 @@ const Home = ()=>{
           </div>
 
           <div className='contact-content'>
-            <Outlet context={{selectedChat, setSelectedChat, setMessageIsLoading}} />
+            <Outlet context={{selectedChat, setSelectedChat }} />
           </div>
 
           <div className='profile p-3'>
@@ -78,7 +128,7 @@ const Home = ()=>{
             <div className='recipient p-3'>
               {!messageIsLoading ? (
                 <>
-                  <img src="/default-avatar.png" alt="" height='40px' />
+                  <img src={selectedChat.isGroupChat ? '/default-group.jpg' : '/default-avatar.png'} className='rounded-circle' alt="" height='40px' />
                   <span>{(selectedChat?.isGroupChat) ?
                   (selectedChat?.chatName) : (selectedChat?.users[0].username===user.data?.username) ?
                   (selectedChat?.users[1].username) : 
@@ -94,17 +144,18 @@ const Home = ()=>{
               )}
             </div>
 
-            <div className="messages-content" ref={chatContent}>
+            <div className="messages-content">
               <div className='container my-3'>
+                <ChatContent socket={socket} selectedChat={selectedChat} setMessageIsLoading={setMessageIsLoading} />
               </div>
             </div>
 
             <div className='input-message p-3'>
-              <form method="POST">
+              <form onSubmit={sendMessage}>
                 <button type='button' className='cool-btn'>
                   <i className="fa-solid fa-paperclip"></i>
                 </button>
-                <input ref={inputEl} className='input-theme' type="text" placeholder='Type your message' autoComplete="false" />
+                <input id='inputEl' ref={inputEl} className='input-theme' type="text" placeholder='Type your message' autoComplete="false" />
                 <button type='submit' className='cool-btn'>
                   <img src={send} alt=""  />
                 </button>

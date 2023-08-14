@@ -1,6 +1,6 @@
 import { Router } from "express";
 import authMiddleware from '../middleware/authMiddleware.js';
-import { allChats, accessPersonalChat, createGroup, history, updateGroup, inviteToGroup, kickFromGroup } from "../controller/chatController.js";
+import { allChats, accessPersonalChat, createGroup, history, updateGroup, inviteToGroup, kickFromGroup, sendMessage } from "../controller/chatController.js";
 
 const router = Router();
 
@@ -14,16 +14,19 @@ router.post('/', authMiddleware, accessPersonalChat);
 router.post('/group', authMiddleware, createGroup);
 
 // Edit Group chat
-router.put('/group/:id/update', authMiddleware, updateGroup);
+router.put('/group/update', authMiddleware, updateGroup);
 
 // Invite to Group chat
-router.put('/group/:id/invite', authMiddleware, inviteToGroup);
+router.put('/group/invite', authMiddleware, inviteToGroup);
 
 // Kick from Group chat
-router.put('/group/:id/kick', authMiddleware, kickFromGroup);
+router.put('/group/kick', authMiddleware, kickFromGroup);
 
 // Get all messages of chat
 router.get('/:id', authMiddleware, history);
+
+// Send message
+router.post('/:id', authMiddleware, sendMessage);
 
 
 export default router;

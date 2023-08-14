@@ -4,18 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import { ChatState } from "../context/ChatProvider";
 
 const Friends = () => {
-    const { user } = ChatState();
+    const { friends, setFriends, chats, setChats } = ChatState();
     const [searchAdd, setSearchAdd] = useState('');
     const [searchAddResult, setSearchAddResult] = useState([]);
     const [friendResult, setFriendResult] = useState([]);
+    const [message, setMessage] = useState('Please input')
 
-    const { setSelectedChat, setMessageIsLoading } = useOutletContext();
+    const { setSelectedChat } = useOutletContext();
     const searchAddEl = useRef();
     const navigate = useNavigate()
 
-    useEffect(()=>{
-        const friends = user.data?.friends;
-        friends.sort((a, b) => {
+    useEffect(()=>{;
+        friends?.sort((a, b) => {
             if ( a.username < b.username ){
                 return -1;
             }
@@ -25,12 +25,12 @@ const Friends = () => {
             return 0;
         });
         setFriendResult(friends);
-    }, [user]);
+    }, [friends]);
 
     // Search friend
     const searchFriends = (search)=>{
         const re = new RegExp(search, 'i');
-        const filteredFriends = user.data?.friends.filter(friend => friend.username.match(re));
+        const filteredFriends = friends?.filter(friend => friend.username.match(re));
         setFriendResult(filteredFriends);
     }
 
@@ -40,20 +40,33 @@ const Friends = () => {
 
         if(searchAdd){
             await axios.get(`/api/users?search=${searchAdd}`)
-                .then(res=>setSearchAddResult(res.data.data))
+                .then(res=>{
+                    setSearchAddResult(res.data.data);
+                    setMessage('User not found');
+                })
                 .catch(err=>console.error(err.response));
-        } else{
-            setSearchAddResult([]);
         }
+    }
+
+    // Add or Remove to friendlist
+    const handleEditFriends = async (userId) => {
+        await axios.put('/api/users/friends/edit', {userId})
+            .then(res => {
+                if (!friends?.find(f => f._id === userId)) {
+                    setFriends([...friends, res.data.data]);
+                } else {
+                    setFriends(friends?.filter(f => f._id !== userId));
+                }
+            })
+            .catch(err => console.error(err.response));
     }
 
     // Select friend
     const handleSelectFriend = async (id) => {
-        setMessageIsLoading(true);
         await axios.post('/api/chat', {userId: id})
             .then(res => {
                 setSelectedChat(res.data.data);
-                setMessageIsLoading(false);
+                setChats([...chats, res.data.data]);
                 navigate('/');
             })
             .catch(err => console.error(err.response));
@@ -110,12 +123,12 @@ const Friends = () => {
                                 <div className="d-flex justify-content-start align-items-center gap-2 py-2" style={{height: '70px'}}>
                                     <img src={u.avatar} alt="" style={{height: '100%'}} />
                                     <h6>{u.username}</h6>
-                                        {!user.data.friends.includes(u._id) ? (
-                                        <button className="btn btn-primary ms-auto" onClick={()=>console.log('add')}>
+                                        {!friends?.find(f => f._id === u._id) ? (
+                                        <button className="btn btn-primary ms-auto" onClick={()=>handleEditFriends(u._id)}>
                                             <i className="fa-solid fa-user-plus"></i> Add
                                         </button>
                                         ) : (
-                                        <button className="btn btn-outline-primary ms-auto" onClick={()=>console.log('remove')}>
+                                        <button className="btn btn-outline-primary ms-auto" onClick={()=>handleEditFriends(u._id)}>
                                             <i className="fa-solid fa-user-minus"></i> Remove
                                         </button>
                                         )}
@@ -123,8 +136,8 @@ const Friends = () => {
                                 <hr className="text-white m-0" />
                             </div>
                             ))) : (
-                            <h5 className="text-center mt-3">User not found</h5>
-                            )}
+                            <h6 className="text-center mt-3">{message}</h6>)
+                            }
                         </div>
                     </div>
                 </div>

@@ -2,8 +2,8 @@ import { useRef, useState } from 'react'
 import { ChatState } from '../context/ChatProvider';
 import axios from 'axios';
 
-const CreateGroupModal = ({ chats, setChats }) => {
-    const { user } = ChatState();
+const CreateGroupModal = () => {
+    const { friends, chats, setChats } = ChatState();
     const [friendResult, setFriendResult] = useState([]);
 
     const [chatName, setChatName] = useState("");
@@ -19,7 +19,7 @@ const CreateGroupModal = ({ chats, setChats }) => {
     const searchFriends = (search) => {
         setAddUser(search);
         let re = new RegExp(search, 'i');
-        const filteredFriends = user.data?.friends.filter(friend => friend.username.match(re));
+        const filteredFriends = friends?.filter(friend => friend.username.match(re));
         setFriendResult(search ? filteredFriends : []);
     }
 
@@ -80,7 +80,7 @@ const CreateGroupModal = ({ chats, setChats }) => {
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content bg-theme-primary">
                     <div className="modal-header">
-                        <button type="button" data-bs-toggle="modal" data-bs-target="#makeChatModal" className="cool-btn me-2"><i className="fa-solid fa-arrow-left"></i></button>
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#newChatModal" className="cool-btn me-2"><i className="fa-solid fa-arrow-left"></i></button>
                         <h1 className="modal-title fs-5">Create Group</h1>
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -110,7 +110,7 @@ const CreateGroupModal = ({ chats, setChats }) => {
                                 </div>
                             </div>
 
-                            <div className='mb-3'>
+                            <div className='mb-3' style={{overflowY: 'scroll', maxHeight: '280px'}}>
                                 {friendResult.map(friend=>(
                                 <div key={friend._id} onClick={() => addFriendToGroup(friend)} className='person'>
                                     <div className='person-avatar'>

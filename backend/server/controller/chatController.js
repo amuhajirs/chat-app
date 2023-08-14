@@ -20,19 +20,14 @@ export const accessPersonalChat = async (req, res)=>{
     }
 
     // Check if the chat exist
-    let chat;
-    try {
-        chat = await Chat.findOne({
-            isGroupChat: false,
-            $and: [
-                {users: {$in: req.user._id}},
-                {users: {$in: userId}}
-            ]
-        })
-            .populate('users', ['-password', '-friends']);
-    } catch (err) {
-        return res.status(500).json({message: err.message})
-    }
+    let chat = await Chat.findOne({
+        isGroupChat: false,
+        $and: [
+            {users: {$in: req.user._id}},
+            {users: {$in: userId}}
+        ]
+    })
+        .populate('users', ['-password', '-friends']);
 
     if(chat) {
         return res.json({message: 'Chat already exist', data: chat})
@@ -95,11 +90,10 @@ export const createGroup = async (req, res)=>{
 
 // PUT /api/group/:id/update
 export const updateGroup = async (req, res)=>{
-    const { id } = req.params;
-    const { chatName, chatDesc } = req.body;
+    const { id, chatName, chatDesc } = req.body;
 
-    if(!chatName) {
-        return res.status(400).json({message: 'chatName field must be filled'});
+    if(!chatName || !id) {
+        return res.status(400).json({message: 'id and chatName field must be filled'});
     }
 
     try {
@@ -113,8 +107,11 @@ export const updateGroup = async (req, res)=>{
 
 // PUT /api/chat/:id/invite
 export const inviteToGroup = async (req, res)=>{
-    const { id } = req.params;
-    const { userId } = req.body;
+    const { id, userId } = req.body;
+
+    if(!userId || !id) {
+        return res.status(400).json({message: 'id and userId field must be filled'});
+    }
 
     try {
         await Chat.findByIdAndUpdate(id, {
@@ -131,8 +128,11 @@ export const inviteToGroup = async (req, res)=>{
 
 // PUT /api/chat/:id/kick
 export const kickFromGroup = async (req, res)=>{
-    const { id } = req.params;
-    const { userId } = req.body;
+    const { id, userId } = req.body;
+
+    if(!userId || !id) {
+        return res.status(400).json({message: 'id and userId field must be filled'});
+    }
 
     try {
         await Chat.findByIdAndUpdate(id, {
@@ -154,10 +154,35 @@ export const history = async (req, res)=>{
 
     try {
         messages = await Message.find({chat: id})
+            .populate('sender', ['-password', '-friends'])
             .sort({createdAt: 'asc'});
     } catch (err) {
-        return res.json({message: err.message})
+        return res.status(400).json({message: err.message})
     }
 
     res.json({data: messages});
+}
+
+// POST /api/chat/send
+export const sendMessage = async (req, res)=>{
+    const { chat, text } = req.body;
+
+    if(!chat || !text) {
+        return res.status(400).json({message: 'sender, chat, text field must be filled'});
+    }
+
+    let message
+    try {
+        message = await Message.create({sender: req.user._id, chat, text});
+    } catch (err) {
+        return res.status(500).json({message: err.message});
+    }
+
+    try {
+        await Chat.findByIdAndUpdate(chat, {latestMessage: message._id});
+    } catch (err) {
+        return res.status(500).json({message: err.message});
+    }
+
+    res.json({message: 'message has been saved to database'});
 }
