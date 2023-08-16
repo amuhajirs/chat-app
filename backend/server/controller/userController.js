@@ -11,7 +11,7 @@ export const allUsers = async (req, res)=>{
             $options: 'i'
         }
     })
-        .select({_id: 1, username: 1, avatar: 1, email: 1})
+        .select(['-password', '-friends', '-chats'])
         .sort([['username', 'asc']]);
 
     res.json({data: users});
@@ -28,7 +28,7 @@ export const getFriends = async (req, res)=>{
             $options: 'i'
         }
     })
-        .select({_id: 1, username: 1, avatar: 1, email: 1})
+        .select(['-password', '-friends', '-chats'])
         .sort([['username', 'asc']]);
 
     res.json({data: friends});

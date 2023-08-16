@@ -1,11 +1,11 @@
 import { Router } from "express";
 import authMiddleware from '../middleware/authMiddleware.js';
-import { allChats, accessPersonalChat, createGroup, history, updateGroup, inviteToGroup, kickFromGroup, sendMessage } from "../controller/chatController.js";
+import { myChats, accessPersonalChat, createGroup, history, updateGroup, inviteToGroup, kickFromGroup, sendMessage } from "../controller/chatController.js";
 
 const router = Router();
 
 // Get all recent chat
-router.get('/', authMiddleware, allChats)
+router.get('/', authMiddleware, myChats)
 
 // Access or create Personal chat
 router.post('/', authMiddleware, accessPersonalChat);
