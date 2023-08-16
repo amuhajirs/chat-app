@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { ChatState } from "../context/ChatProvider";
 import CreateGroupModal from "../components/CreateGroupModal";
+import { showLatestMessage } from "../config/ChatLogics";
 
 const Chats = () => {
     const { user, chats } = ChatState();
@@ -60,7 +61,7 @@ const Chats = () => {
                         (chat.chatName) : (chat.users[0].username===user.data?.username) ?
                         (chat.users[1].username) :
                         (chat.users[0].username)}</p>
-                        <p style={{fontSize: '13px'}}>{chat.latestMessage?.text}</p>
+                        <p style={{fontSize: '13px'}}>{showLatestMessage(chat, user.data?.username)}</p>
                     </div>
                 </div>
             </div>

@@ -7,40 +7,37 @@ const ChatProvider = ({children}) => {
     const [user, setUser] = useState({login: true});
     const [friends, setFriends] = useState([]);
     const [chats, setChats] = useState([]);
+    const [notif, setNotif] = useState([]);
 
     useEffect(() => {
         fetchUser();
     }, []);
 
-    useEffect(() => {
-        fetchChats();
-    }, [user])
-
     // Get user login info and friends
     const fetchUser = async () => {
         await axios.get('/api/auth/loggedIn')
             .then(res => {
-                setFriends(res.data.data.friends);
-                delete res.data.data.friends;
-                setUser(res.data);
+                setUser({login: res.data.login, data: res.data.data?.user});
+                setFriends(res.data.data?.friends);
+                setChats(res.data.data?.chats);
             })
             .catch(err => {
                 setUser({login: false});
-                console.error(err.response);
+                console.error(err);
             })
-    }
-
-    // Get all the personal and group chats
-    const fetchChats = async () => {
-        await axios.get('/api/chat')
-            .then(res => {
-                setChats(res.data.data);
-            })
-            .catch(err => console.error(err.response));
     }
 
     return(
-        <ChatContext.Provider value={{user, setUser, friends, setFriends, chats, setChats}}>
+        <ChatContext.Provider value={{
+            user,
+            setUser,
+            friends,
+            setFriends,
+            chats,
+            setChats,
+            notif,
+            setNotif
+        }}>
             {children}
         </ChatContext.Provider>
     );

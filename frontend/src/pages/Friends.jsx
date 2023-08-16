@@ -66,7 +66,9 @@ const Friends = () => {
         await axios.post('/api/chat', {userId: id})
             .then(res => {
                 setSelectedChat(res.data.data);
-                setChats([...chats, res.data.data]);
+                if(!chats.find(c => c._id===res.data.data._id)){
+                    setChats([res.data.data, ...chats]);
+                };
                 navigate('/');
             })
             .catch(err => console.error(err.response));
@@ -87,14 +89,17 @@ const Friends = () => {
             </div>
 
             {friendResult.map(friend=>(
-            <div key={friend._id} onClick={()=>handleSelectFriend(friend._id)} className='person'>
-                <div className='person-avatar'>
-                    <div className={friend.online ? 'online' : 'offline'}></div>
-                    <img src={friend.avatar} alt="" />
+            <div key={friend._id} className='person-wrapper'>
+                <div className="person">
+                    <div className='person-avatar'>
+                        <div className={friend.online ? 'online' : 'offline'}></div>
+                        <img src={friend.avatar} alt="" />
+                    </div>
+                    <div>
+                        <span>{friend.username}</span>
+                    </div>
                 </div>
-                <div>
-                    <span>{friend.username}</span>
-                </div>
+                <button className="cool-btn" onClick={()=>handleSelectFriend(friend._id)}><i className="fa-solid fa-message" style={{fontSize: '12px'}}></i></button>
             </div>
             ))}
 

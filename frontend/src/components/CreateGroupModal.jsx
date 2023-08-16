@@ -112,13 +112,15 @@ const CreateGroupModal = () => {
 
                             <div className='mb-3' style={{overflowY: 'scroll', maxHeight: '280px'}}>
                                 {friendResult.map(friend=>(
-                                <div key={friend._id} onClick={() => addFriendToGroup(friend)} className='person'>
-                                    <div className='person-avatar'>
-                                        <div className={friend.online ? 'online' : 'offline'}></div>
-                                        <img src={friend.avatar} alt="" />
-                                    </div>
-                                    <div>
-                                        <span>{friend.username}</span>
+                                <div key={friend._id} className="person-wrapper" onClick={() => addFriendToGroup(friend)}>
+                                    <div className='person'>
+                                        <div className='person-avatar'>
+                                            <div className={friend.online ? 'online' : 'offline'}></div>
+                                            <img src={friend.avatar} alt="" />
+                                        </div>
+                                        <div>
+                                            <span>{friend.username}</span>
+                                        </div>
                                     </div>
                                 </div>
                                 ))}

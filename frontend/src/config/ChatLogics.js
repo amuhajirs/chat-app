@@ -39,3 +39,16 @@ export const isSameSender = (messages, m, i) => {
             messages[i + 1].sender._id === undefined)
     );
 }
+
+export const showLatestMessage = (chat, myUsername) => {
+    return (chat.latestMessage && (
+        chat.isGroupChat ? (
+            // Group Chat
+            `${chat.latestMessage?.sender.username === myUsername ?
+                'You' : chat.latestMessage?.sender.username}: ${chat.latestMessage?.text}`) : (
+            
+            // Personal Chat
+            (chat.latestMessage?.sender.username === myUsername ? 'You: ' : '') + chat.latestMessage?.text
+        )
+    ))
+}

@@ -2,8 +2,8 @@ import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
-import { io } from 'socket.io-client'
 
+import { socket } from '../socket';
 import { ChatState } from '../context/ChatProvider';
 import ChatContent from '../components/ChatContent';
 
@@ -11,7 +11,6 @@ import send from '../assets/send.svg';
 
 const Home = ()=>{
   const { user, setUser, chats, setChats } = ChatState();
-  const [socket, setSocket] = useState(undefined)
   const [selectedChat, setSelectedChat] = useState();
   const [messageIsLoading, setMessageIsLoading] = useState(false);
 
@@ -19,18 +18,31 @@ const Home = ()=>{
   const inputEl = useRef();
 
   useEffect(() => {
-    const newSocket = io('ws://localhost:3001');
-    newSocket.on('connect', () => {
+    // Connect to socket.io
+    socket.connect();
+
+    // On connect to socket.io
+    socket.on('connect', () => {
       console.log('connected to socket.io');
-      setSocket(newSocket);
     });
+
+    // On disconnect to socket.io
+    socket.on('disconnect', () => {
+      console.log('disconnected to socket.io');
+    });
+
+    return () => {
+      socket.disconnect();
+    }
   }, []);
 
   useEffect(() => {
-    const chatsId = chats.map(c=>c._id)
-    socket?.emit('join all chats', chatsId);
+    // Join to all chats room
+    const chatsId = chats.map(c=>c._id);
+    socket.emit('join all chats', chatsId);
 
-    socket?.on('receive message', newMessage => {
+    // Update latestMessage on receive message and move the chat to up
+    const updateLatestMessage = newMessage => {
       const updatedChats = chats.map(c => {
           if (c._id===newMessage.chat) {
               c.latestMessage = newMessage;
@@ -38,8 +50,16 @@ const Home = ()=>{
           return c;
       });
 
+      const index = updatedChats.findIndex(c => newMessage.chat===c._id);
+      updatedChats.unshift(updatedChats.splice(index, 1)[0]);
       setChats(updatedChats);
-  });
+    }
+
+    socket.on('receive message', updateLatestMessage);
+
+    return () => {
+      socket.off('receive message', updateLatestMessage)
+    }
   }, [chats]);
 
   // Log out
@@ -47,6 +67,7 @@ const Home = ()=>{
     await axios.get('/api/auth/logout')
       .then(()=>{
         setUser({login: false});
+        socket.disconnect();
         navigate('/login');
       })
       .catch(err=>console.error(err.response));
@@ -67,16 +88,7 @@ const Home = ()=>{
 
     inputEl.current.value = "";
 
-    socket?.emit('send message', message);
-
-    const updatedChats = chats.map(c => {
-      if (c._id===message.chat) {
-        c.latestMessage = message;
-      }
-      return c;
-    });
-
-    setChats(updatedChats);
+    socket.emit('send message', message);
 
     await axios.post('/api/chat/send', message)
       .catch(err => console.error(err.response));
@@ -146,7 +158,7 @@ const Home = ()=>{
 
             <div className="messages-content">
               <div className='container my-3'>
-                <ChatContent socket={socket} selectedChat={selectedChat} setMessageIsLoading={setMessageIsLoading} />
+                <ChatContent selectedChat={selectedChat} setMessageIsLoading={setMessageIsLoading} />
               </div>
             </div>
 
@@ -155,7 +167,7 @@ const Home = ()=>{
                 <button type='button' className='cool-btn'>
                   <i className="fa-solid fa-paperclip"></i>
                 </button>
-                <input id='inputEl' ref={inputEl} className='input-theme' type="text" placeholder='Type your message' autoComplete="false" />
+                <input id='inputEl' ref={inputEl} className='input-theme' type="text" placeholder='Type your message' autoComplete="off" />
                 <button type='submit' className='cool-btn'>
                   <img src={send} alt=""  />
                 </button>

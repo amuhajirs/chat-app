@@ -91,7 +91,7 @@ p{
 .contact-content {
     background-color: black;
     height: calc(100% - 70px - 40px - 70px);
-    overflow-y: scroll;
+    overflow-y: overlay;
     overflow-x: hidden;
 }
 
@@ -150,16 +150,11 @@ p{
 /* End of Chat */
 
 /* Person */
-
-.person {
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 10px;
+.person-wrapper {
     height: 60px;
-    padding: 10px;
+    width: 100%;
     border-bottom: 1px solid gray;
-    cursor: pointer;
+    position: relative;
 }
 
 .person:hover {
@@ -168,6 +163,29 @@ p{
 
 .person:active{
     background-color: rgb(35, 35, 35);
+}
+
+.person-wrapper > .cool-btn {
+    background-color: rgb(83, 83, 83);
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.person {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    height: 100%;
+}
+
+.person>div:not(.person-avatar) {
+    padding-top: 5px;
+    overflow: hidden;
 }
 
 .person-avatar{
@@ -198,11 +216,6 @@ p{
     right: 3px;
     bottom: 3px;
     border: 1px solid white;
-}
-
-.person>div:not(.person-avatar) {
-    padding-top: 5px;
-    overflow: hidden;
 }
 
 .person-chat{

@@ -1,6 +1,14 @@
+import { ChatState } from "../context/ChatProvider";
+
 const Notification = () => {
+    const { notif } = ChatState();
+
     return (
-        <h1>Notification</h1>
+        notif.map(n => (
+            <div>
+                
+            </div>
+        ))
     )
 }
 

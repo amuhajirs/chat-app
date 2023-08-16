@@ -2,21 +2,31 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import GroupChat from './GroupChat';
 import SingleChat from './SingleChat';
+import { socket } from '../socket';
 
-const ChatContent = ({ socket, selectedChat, setMessageIsLoading }) => {
-    const [messages, setMessages] = useState([]);
+const ChatContent = ({ selectedChat, setMessageIsLoading }) => {
+    const [ messages, setMessages] = useState([]);
 
     useEffect(() => {
         fetchMessages();
     }, [selectedChat]);
 
-    // Receive message from socket.io
+    // Update messages on receive message
     useEffect(() => {
-        socket?.on('receive message', newMessage => {
+        const onReceiveMessage = newMessage => {
             if(newMessage.chat===selectedChat._id) {
                 setMessages([...messages, newMessage]);
             }
-        });
+        };
+
+        socket.on('receive message', onReceiveMessage)
+
+        return () => {
+            socket.off('receive message', onReceiveMessage)
+        }
+    }, [messages]);
+
+    useEffect(() => {
         scrollToBottom();
     }, [messages])
 
