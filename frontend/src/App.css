@@ -255,15 +255,26 @@ p{
     color: white;
     width: fit-content;
     max-width: 70%;
-    padding: 7px 15px;
-    border-radius: 20px;
+    padding: 6px 13px;
+    border-radius: 15px;
     word-wrap: break-word;
+}
+
+.message.last {
+    border-radius: 15px 15px 15px 0;
 }
 
 .message.me {
     margin-left: auto !important;
     background-color: white;
+}
+
+.message.me > span {
     color: rgb(60, 60, 60);
+}
+
+.message.me.last {
+    border-radius: 15px 15px 0 15px;
 }
 
 .message sub{

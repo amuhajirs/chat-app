@@ -3,7 +3,7 @@ import Message from "../model/Message.js";
 import User from "../model/User.js";
 
 // GET /api/chat
-export const myChats = async (req, res)=>{
+export const myChats = async (req, res) => {
     const chats = await User.findById(req.user._id)
         .populate({
             path: 'chats',
@@ -28,7 +28,7 @@ export const myChats = async (req, res)=>{
 }
 
 // POST /api/chat/
-export const accessPersonalChat = async (req, res)=>{
+export const accessPersonalChat = async (req, res) => {
     const { userId } = req.body;
 
     if(!userId) {
@@ -79,7 +79,7 @@ export const accessPersonalChat = async (req, res)=>{
 }
 
 // POST /api/chat/group
-export const createGroup = async (req, res)=>{
+export const createGroup = async (req, res) => {
     const { chatName, chatDesc, users } = req.body;
 
     if(!users || !chatName) {
@@ -106,7 +106,9 @@ export const createGroup = async (req, res)=>{
         return res.status(500).json({message: err.message});
     }
 
-    await User.findByIdAndUpdate(req.user._id, {$push: {chats: chat._id}});
+    users.forEach(async (u) => {
+        await User.findByIdAndUpdate(u, {$push: {chats: chat._id}});
+    });
 
     chat = await chat
         .populate('users groupAdmin', ['-password', '-friends']);
@@ -115,7 +117,7 @@ export const createGroup = async (req, res)=>{
 }
 
 // PUT /api/group/:id/update
-export const updateGroup = async (req, res)=>{
+export const updateGroup = async (req, res) => {
     const { id, chatName, chatDesc } = req.body;
 
     if(!chatName || !id) {
@@ -132,7 +134,7 @@ export const updateGroup = async (req, res)=>{
 }
 
 // PUT /api/chat/:id/invite
-export const inviteToGroup = async (req, res)=>{
+export const inviteToGroup = async (req, res) => {
     const { id, userId } = req.body;
 
     if(!userId || !id) {
@@ -153,7 +155,7 @@ export const inviteToGroup = async (req, res)=>{
 }
 
 // PUT /api/chat/:id/kick
-export const kickFromGroup = async (req, res)=>{
+export const kickFromGroup = async (req, res) => {
     const { id, userId } = req.body;
 
     if(!userId || !id) {
@@ -174,7 +176,7 @@ export const kickFromGroup = async (req, res)=>{
 }
 
 // GET /api/chat/:id
-export const history = async (req, res)=>{
+export const history = async (req, res) => {
     const { id } = req.params;
     let messages;
 
@@ -190,7 +192,7 @@ export const history = async (req, res)=>{
 }
 
 // POST /api/chat/send
-export const sendMessage = async (req, res)=>{
+export const sendMessage = async (req, res) => {
     const { chat, text } = req.body;
 
     if(!chat || !text) {
@@ -211,4 +213,14 @@ export const sendMessage = async (req, res)=>{
     }
 
     res.json({message: 'message has been saved to database'});
+}
+
+// DELETE /api/chat/:id/delete
+export const deletePersonalChat = async (req, res) => {
+
+}
+
+// DELETE /api/chat/group/:id/delete
+export const deleteGroup = async (req, res) => {
+
 }

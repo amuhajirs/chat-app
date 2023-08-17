@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { ChatState } from '../context/ChatProvider';
 import axios from 'axios';
+import { socket } from '../socket';
 
 const CreateGroupModal = () => {
     const { friends, chats, setChats } = ChatState();
@@ -62,13 +63,12 @@ const CreateGroupModal = () => {
 
         await axios.post('/api/chat/group', data)
             .then(res => {
-                console.log(res.data);
                 setChatName("");
                 setChatDesc("");
                 setAddUser("");
                 setUsers([]);
                 setFriendResult([]);
-                setChats([res.data.data, ...chats]);
+                socket.emit('create group', res.data.data);
                 window.bootstrap.Modal.getInstance(myModal.current).hide();
             })
             .catch(err => console.error(err.response))

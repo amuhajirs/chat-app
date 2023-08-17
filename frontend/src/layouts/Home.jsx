@@ -37,15 +37,21 @@ const Home = ()=>{
   }, []);
 
   useEffect(() => {
-    // Join to all chats room
-    const chatsId = chats.map(c=>c._id);
-    socket.emit('join all chats', chatsId);
+    if (user.data) {
+      socket.emit('join rooms', user.data?._id);
+    }
+  }, [user]);
 
-    // Update latestMessage on receive message and move the chat to up
+  useEffect(() => {
+    // Join to all chats room
+    const chatsId= chats?.filter(c => c.isGroupChat).map(c => c._id);
+    socket.emit('join rooms', chatsId);
+
+    // Update latestMessage and move the chat to up
     const updateLatestMessage = newMessage => {
       const updatedChats = chats.map(c => {
           if (c._id===newMessage.chat) {
-              c.latestMessage = newMessage;
+            c.latestMessage = newMessage;
           }
           return c;
       });
@@ -55,10 +61,20 @@ const Home = ()=>{
       setChats(updatedChats);
     }
 
+    // Update chats
+    const updateChats = data => {
+      setChats([data, ...chats]);
+    }
+
+    // Listen on receive message
     socket.on('receive message', updateLatestMessage);
 
+    // Listen on new Group
+    socket.on('new group', updateChats);
+
     return () => {
-      socket.off('receive message', updateLatestMessage)
+      socket.off('receive message', updateLatestMessage);
+      socket.off('new group', updateChats);
     }
   }, [chats]);
 
@@ -76,6 +92,7 @@ const Home = ()=>{
   const sendMessage = async (e) => {
     e.preventDefault();
 
+    // make sure the message not empty
     if(!inputEl.current.value.trim()){
       return
     }
@@ -88,7 +105,11 @@ const Home = ()=>{
 
     inputEl.current.value = "";
 
-    socket.emit('send message', message);
+    if(selectedChat.isGroupChat) {
+      socket.emit('group message', message);
+    } else {
+      socket.emit('private message', {...message, recipient: selectedChat.users});
+    }
 
     await axios.post('/api/chat/send', message)
       .catch(err => console.error(err.response));

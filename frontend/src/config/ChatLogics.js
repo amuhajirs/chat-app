@@ -1,3 +1,4 @@
+// Same sender but not me check next message
 export const isSameSenderLast = (messages, m, i, userId) => {
     return (
         i < messages.length - 1 &&
@@ -7,6 +8,7 @@ export const isSameSenderLast = (messages, m, i, userId) => {
     );
 }
 
+// Last message but not me
 export const isLastMessage = (messages, i, userId) => {
     return (
         (i === messages.length - 1) &&
@@ -15,6 +17,7 @@ export const isLastMessage = (messages, i, userId) => {
     );
 }
 
+// Same sender but not me check previous message
 export const isSameSenderFirst = (messages, m, i, userId) => {
     return (
         i > 0 &&
@@ -24,6 +27,7 @@ export const isSameSenderFirst = (messages, m, i, userId) => {
     );
 }
 
+// First message but not me
 export const isFirstMessage = (messages, i, userId) => {
     return (
         (i === 0) &&
@@ -32,6 +36,7 @@ export const isFirstMessage = (messages, i, userId) => {
     );
 }
 
+// Same sender includes me check next messages
 export const isSameSender = (messages, m, i) => {
     return (
         i < messages.length - 1 &&
@@ -40,6 +45,15 @@ export const isSameSender = (messages, m, i) => {
     );
 }
 
+// Last message includes me
+export const isLastMessageIncludeMe = (messages, i, userId) => {
+    return (
+        (i === messages.length - 1) &&
+        messages[messages.length - 1].sender._id
+    );
+}
+
+// Show latest message
 export const showLatestMessage = (chat, myUsername) => {
     return (chat.latestMessage && (
         chat.isGroupChat ? (

@@ -57,13 +57,22 @@ const io = new Server(server, {
 io.on('connection', socket => {
     console.log(`${socket.id} connected`);
 
-    socket.on('join all chats', chatsId => {
-        socket.join(chatsId);
-        console.log('User has joined the room:', chatsId);
+    socket.on('join rooms', ids => {
+        socket.join(ids);
+        console.log(`${socket.id} joined to: `, socket.rooms);
     });
 
-    socket.on('send message', message => {
-        console.log(message);
-        io.in(message.chat).emit('receive message', message);
+    socket.on('group message', message => {
+        io.to(message.chat).emit('receive message', message);
+    });
+
+    socket.on('private message', message => {
+        io.to(message.recipient[0]._id).to(message.recipient[1]._id).emit('receive message', message);
+    });
+
+    socket.on('create group', data => {
+        (data.users).forEach(u => {
+            io.to(u._id).emit('new group', data);
+        });
     });
 });
