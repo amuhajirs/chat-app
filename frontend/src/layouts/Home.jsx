@@ -10,7 +10,7 @@ import ChatContent from '../components/ChatContent';
 import send from '../assets/send.svg';
 
 const Home = ()=>{
-  const { user, setUser, chats, setChats } = ChatState();
+  const { user, setUser, chats, setChats, setFriends } = ChatState();
   const [selectedChat, setSelectedChat] = useState();
   const [messageIsLoading, setMessageIsLoading] = useState(false);
 
@@ -37,45 +37,16 @@ const Home = ()=>{
   }, []);
 
   useEffect(() => {
-    if (user.data) {
+    // Join to my room
+    if(user.data) {
       socket.emit('join rooms', user.data?._id);
     }
   }, [user]);
 
   useEffect(() => {
     // Join to all chats room
-    const chatsId= chats?.filter(c => c.isGroupChat).map(c => c._id);
+    const chatsId = chats.filter(c => c.isGroupChat).map(c => c._id);
     socket.emit('join rooms', chatsId);
-
-    // Update latestMessage and move the chat to up
-    const updateLatestMessage = newMessage => {
-      const updatedChats = chats.map(c => {
-          if (c._id===newMessage.chat) {
-            c.latestMessage = newMessage;
-          }
-          return c;
-      });
-
-      const index = updatedChats.findIndex(c => newMessage.chat===c._id);
-      updatedChats.unshift(updatedChats.splice(index, 1)[0]);
-      setChats(updatedChats);
-    }
-
-    // Update chats
-    const updateChats = data => {
-      setChats([data, ...chats]);
-    }
-
-    // Listen on receive message
-    socket.on('receive message', updateLatestMessage);
-
-    // Listen on new Group
-    socket.on('new group', updateChats);
-
-    return () => {
-      socket.off('receive message', updateLatestMessage);
-      socket.off('new group', updateChats);
-    }
   }, [chats]);
 
   // Log out
@@ -83,10 +54,12 @@ const Home = ()=>{
     await axios.get('/api/auth/logout')
       .then(()=>{
         setUser({login: false});
+        setFriends([]);
+        setChats([]);
         socket.disconnect();
         navigate('/login');
       })
-      .catch(err=>console.error(err.response));
+      .catch(err=>console.error(err));
   }
 
   const sendMessage = async (e) => {
@@ -111,8 +84,8 @@ const Home = ()=>{
       socket.emit('private message', {...message, recipient: selectedChat.users});
     }
 
-    await axios.post('/api/chat/send', message)
-      .catch(err => console.error(err.response));
+    await axios.post('/api/chats/messages/send', message)
+      .catch(err => console.error(err));
   }
 
   return (
@@ -162,10 +135,10 @@ const Home = ()=>{
               {!messageIsLoading ? (
                 <>
                   <img src={selectedChat.isGroupChat ? '/default-group.jpg' : '/default-avatar.png'} className='rounded-circle' alt="" height='40px' />
-                  <span>{(selectedChat?.isGroupChat) ?
-                  (selectedChat?.chatName) : (selectedChat?.users[0].username===user.data?.username) ?
-                  (selectedChat?.users[1].username) : 
-                  (selectedChat?.users[0].username)}</span>
+                  <span>{(selectedChat.isGroupChat) ?
+                  (selectedChat.chatName) : (selectedChat.users[0].username===user.data?.username) ?
+                  (selectedChat.users[1].username) : 
+                  (selectedChat.users[0].username)}</span>
                 </>
                 ) : (
                 <>

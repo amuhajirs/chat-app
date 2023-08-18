@@ -4,7 +4,7 @@ import axios from 'axios';
 import { socket } from '../socket';
 
 const CreateGroupModal = () => {
-    const { friends, chats, setChats } = ChatState();
+    const { friends } = ChatState();
     const [friendResult, setFriendResult] = useState([]);
 
     const [chatName, setChatName] = useState("");
@@ -61,7 +61,7 @@ const CreateGroupModal = () => {
             users: users.map(u => u._id)
         };
 
-        await axios.post('/api/chat/group', data)
+        await axios.post('/api/chats/group', data)
             .then(res => {
                 setChatName("");
                 setChatDesc("");

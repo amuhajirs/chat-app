@@ -18,8 +18,8 @@ const ChatProvider = ({children}) => {
         await axios.get('/api/auth/loggedIn')
             .then(res => {
                 setUser({login: res.data.login, data: res.data.data?.user});
-                setFriends(res.data.data?.friends);
-                setChats(res.data.data?.chats);
+                setFriends(res.data.data?.friends || []);
+                setChats(res.data.data?.chats || []);
             })
             .catch(err => {
                 setUser({login: false});

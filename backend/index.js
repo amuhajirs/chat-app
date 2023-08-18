@@ -34,7 +34,7 @@ app.use(morgan('tiny'));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/chat', chatRoutes);
+app.use('/api/chats', chatRoutes);
 
 // FrontEnd / Static
 app.use(express.static(path.join(__dirname, './build')));

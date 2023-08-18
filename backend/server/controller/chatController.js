@@ -2,7 +2,7 @@ import Chat from "../model/Chat.js";
 import Message from "../model/Message.js";
 import User from "../model/User.js";
 
-// GET /api/chat
+// GET /api/chats
 export const myChats = async (req, res) => {
     const chats = await User.findById(req.user._id)
         .populate({
@@ -27,7 +27,7 @@ export const myChats = async (req, res) => {
     res.json({data: chats.chats});
 }
 
-// POST /api/chat/
+// POST /api/chats
 export const accessPersonalChat = async (req, res) => {
     const { userId } = req.body;
 
@@ -78,7 +78,7 @@ export const accessPersonalChat = async (req, res) => {
     res.json({message: 'New chat has been created', data: chat});
 }
 
-// POST /api/chat/group
+// POST /api/chats/group
 export const createGroup = async (req, res) => {
     const { chatName, chatDesc, users } = req.body;
 
@@ -111,12 +111,12 @@ export const createGroup = async (req, res) => {
     });
 
     chat = await chat
-        .populate('users groupAdmin', ['-password', '-friends']);
+        .populate('users groupAdmin', ['-password', '-friends', '-chats']);
 
     res.json({message: 'Group Chat has been created', data: chat});
 }
 
-// PUT /api/group/:id/update
+// PUT /api/chats/group/update
 export const updateGroup = async (req, res) => {
     const { id, chatName, chatDesc } = req.body;
 
@@ -133,7 +133,7 @@ export const updateGroup = async (req, res) => {
     res.json({message: 'Group Chat updated successfully'});
 }
 
-// PUT /api/chat/:id/invite
+// PUT /api/chats/group/invite
 export const inviteToGroup = async (req, res) => {
     const { id, userId } = req.body;
 
@@ -154,7 +154,7 @@ export const inviteToGroup = async (req, res) => {
     res.json({message: 'User has been invited'});
 }
 
-// PUT /api/chat/:id/kick
+// PUT /api/chats/group/kick
 export const kickFromGroup = async (req, res) => {
     const { id, userId } = req.body;
 
@@ -175,14 +175,14 @@ export const kickFromGroup = async (req, res) => {
     res.json({message: 'User has been kicked'});
 }
 
-// GET /api/chat/:id
+// GET /api/chats/:id
 export const history = async (req, res) => {
     const { id } = req.params;
     let messages;
 
     try {
         messages = await Message.find({chat: id})
-            .populate('sender', ['-password', '-friends'])
+            .populate('sender', ['-password', '-friends', '-chats'])
             .sort({createdAt: 'asc'});
     } catch (err) {
         return res.status(400).json({message: err.message})
@@ -191,7 +191,7 @@ export const history = async (req, res) => {
     res.json({data: messages});
 }
 
-// POST /api/chat/send
+// POST /api/chats/send
 export const sendMessage = async (req, res) => {
     const { chat, text } = req.body;
 
@@ -215,12 +215,48 @@ export const sendMessage = async (req, res) => {
     res.json({message: 'message has been saved to database'});
 }
 
-// DELETE /api/chat/:id/delete
+// PUT /api/chats/add
+export const addChat = async (req, res) => {
+    const { chatId } = req.body;
+
+    let chat
+    try {
+        chat = await Chat.findById(chatId)
+            .populate('users groupAdmin', ['-password', '-friends', '-chats'])
+            .populate({
+                path: 'latestMessage',
+                populate: {
+                    path: 'sender',
+                    select: ['-password', '-friends', '-chats']
+                }
+            });
+    } catch (err) {
+        return res.status(400).json({message: err.message});
+    }
+
+    if(chat) {
+        await User.findByIdAndUpdate(req.user._id, {$addToSet: {chats: chat._id}});
+    } else {
+        return res.status(400).json({message: 'chat not found'})
+    }
+
+    res.json({message: 'chat added', data: chat});
+}
+
+// PUT /api/chats/remove
+export const removeChat = async (req, res) => {
+    const { chatId } = req.body;
+
+    await User.findByIdAndUpdate(req.user._id, {$pull: {chats: chatId}});
+    res.json({message: 'chat removed'});
+}
+
+// DELETE /api/chats/:id/delete
 export const deletePersonalChat = async (req, res) => {
 
 }
 
-// DELETE /api/chat/group/:id/delete
+// DELETE /api/chats/group/:id/delete
 export const deleteGroup = async (req, res) => {
 
 }

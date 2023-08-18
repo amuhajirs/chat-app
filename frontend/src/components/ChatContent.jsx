@@ -8,8 +8,21 @@ const ChatContent = ({ selectedChat, setMessageIsLoading }) => {
     const [ messages, setMessages] = useState([]);
 
     useEffect(() => {
+        // Get history messages
+        const fetchMessages = async () => {
+            setMessageIsLoading(true);
+
+            await axios.get(`/api/chats/messages/${selectedChat._id}`)
+                .then(res => {
+                    setMessages(res.data.data);
+                    scrollToBottom();
+                })
+                .catch(err => console.error(err.response))
+                .finally(() => setMessageIsLoading(false));
+        }
+
         fetchMessages();
-    }, [selectedChat]);
+    }, [selectedChat, setMessageIsLoading]);
 
     // Update messages on receive message
     useEffect(() => {
@@ -24,24 +37,11 @@ const ChatContent = ({ selectedChat, setMessageIsLoading }) => {
         return () => {
             socket.off('receive message', onReceiveMessage)
         }
-    }, [messages]);
+    }, [messages, selectedChat]);
 
     useEffect(() => {
         scrollToBottom();
     }, [messages])
-
-    // Get history messages
-    const fetchMessages = async () => {
-        setMessageIsLoading(true);
-
-        await axios.get(`/api/chat/${selectedChat._id}`)
-            .then(res => {
-                setMessages(res.data.data);
-                scrollToBottom();
-            })
-            .catch(err => console.error(err.response))
-            .finally(() => setMessageIsLoading(false));
-    }
 
     // Automatic scroll to bottom
     const scrollToBottom = () => {

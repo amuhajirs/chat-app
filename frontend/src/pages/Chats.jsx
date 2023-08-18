@@ -3,9 +3,11 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { ChatState } from "../context/ChatProvider";
 import CreateGroupModal from "../components/CreateGroupModal";
 import { showLatestMessage } from "../config/ChatLogics";
+import { socket } from "../socket";
+import axios from "axios";
 
 const Chats = () => {
-    const { user, chats } = ChatState();
+    const { user, chats, setChats } = ChatState();
     const [chatResults, setChatResults] = useState([]);
 
     const { selectedChat, setSelectedChat } = useOutletContext();
@@ -16,6 +18,54 @@ const Chats = () => {
     useEffect(() => {
         setChatResults(chats);
     }, [chats]);
+
+    useEffect(() => {
+        const addChatToUser = async (chatId) => {
+            await axios.put('/api/chats/add', {chatId})
+                .then(res => setChats([res.data.data, ...chats]))
+                .catch(err => console.error(err));
+        }
+    
+        const updateLatestMessage = newMessage => {
+            // if chat not found
+            if(!(chats.find(c => c._id===newMessage.chat))) {
+                addChatToUser(newMessage.chat);
+                return
+            } else if (!(chats[0])) {
+                addChatToUser(newMessage.chat);
+                return
+            }
+    
+            // Update latestMessage
+            const updatedChats = chats.map(c => {
+                if (c._id===newMessage.chat) {
+                    c.latestMessage = newMessage;
+                }
+                return c;
+            });
+    
+            // Move the chat to up
+            const index = updatedChats.findIndex(c => newMessage.chat===c._id);
+            updatedChats.unshift(updatedChats.splice(index, 1)[0]);
+            setChats(updatedChats);
+        }
+    
+        // Update chats
+        const updateChats = data => {
+            setChats([data, ...chats]);
+        }
+    
+        // Listen on receive message
+        socket.on('receive message', updateLatestMessage);
+    
+        // Listen on new Group
+        socket.on('new group', updateChats);
+    
+        return () => {
+            socket.off('receive message', updateLatestMessage);
+            socket.off('new group', updateChats);
+        }
+    }, [chats, setChats]);
     
 
     const searchChats = (search) => {
@@ -25,7 +75,7 @@ const Chats = () => {
             if (c.isGroupChat) {
                 return c.chatName.match(re);
             } else {
-                if (c.users[0] !== user.data?.username) {
+                if (c.users[0].username !== user.data?.username) {
                     return c.users[1].username.match(re);
                 } else {
                     return c.users[0].username.match(re);

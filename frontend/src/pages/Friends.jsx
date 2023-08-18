@@ -63,7 +63,7 @@ const Friends = () => {
 
     // Select friend
     const handleSelectFriend = async (id) => {
-        await axios.post('/api/chat', {userId: id})
+        await axios.post('/api/chats', {userId: id})
             .then(res => {
                 setSelectedChat(res.data.data);
                 if(!chats.find(c => c._id===res.data.data._id)){
