@@ -250,6 +250,7 @@ export const addChat = async (req, res) => {
 // PUT /api/chats/remove
 export const removeChat = async (req, res) => {
     const { chatId } = req.body;
+    console.log(chatId)
 
     await User.findByIdAndUpdate(req.user._id, {$pull: {chats: chatId}});
     res.json({message: 'chat removed'});

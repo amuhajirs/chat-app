@@ -1,4 +1,20 @@
 /* Theme */
+.bg-theme-primary {
+    background-color: var(--bg-primary);
+}
+
+.dropdown-theme-primary {
+    background-color: var(--bg-primary);
+}
+
+.dropdown-theme-primary * {
+    color: white;
+}
+
+.dropdown-theme-primary * :active {
+    background-color: var(--bg-hover);
+}
+
 .field-theme{
     position: relative;
 }

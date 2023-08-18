@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import axios from "axios";
+import { socket } from "../socket";
+
 import { ChatState } from "../context/ChatProvider";
 import CreateGroupModal from "../components/CreateGroupModal";
 import { showLatestMessage } from "../config/ChatLogics";
-import { socket } from "../socket";
-import axios from "axios";
+import DropdownChat from "../components/DropdownChat";
 
 const Chats = () => {
     const { user, chats, setChats } = ChatState();
@@ -102,16 +104,18 @@ const Chats = () => {
             <div className="cool-active"></div>
             <div className="chat" onClick={() => setSelectedChat(chat)}>
                 <img src={chat.isGroupChat ? '/default-group.jpg' : '/default-avatar.png'} className="rounded-circle" alt="" />
-                <div className="d-flex align-items-center">
-                    <div>
+                <div className="d-flex align-items-center" style={{width: 'calc(100% - 20px - 50px)'}}>
+                    <div style={{width: '100%'}}>
                         <p>{(chat.isGroupChat) ?
-                        (chat.chatName) : (chat.users[0].username===user.data?.username) ?
-                        (chat.users[1].username) :
-                        (chat.users[0].username)}</p>
-                        <p style={{fontSize: '13px'}}>{showLatestMessage(chat, user.data?.username)}</p>
+                            (chat.chatName) : (chat.users[0].username===user.data?.username) ?
+                            (chat.users[1].username) :
+                            (chat.users[0].username)}
+                        </p>
+                        <p style={{fontSize: '13px', textOverflow: 'ellipsis', width: '100%', whiteSpace: 'nowrap', overflow: 'hidden'}}>{showLatestMessage(chat, user.data?.username)}</p>
                     </div>
                 </div>
             </div>
+            <DropdownChat chat={chat} />
         </div>
         ))
         }
