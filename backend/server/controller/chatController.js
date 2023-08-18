@@ -107,7 +107,11 @@ export const createGroup = async (req, res) => {
     }
 
     users.forEach(async (u) => {
-        await User.findByIdAndUpdate(u, {$push: {chats: chat._id}});
+        try {
+            await User.findByIdAndUpdate(u, {$push: {chats: chat._id}});
+        } catch (err) {
+            return res.status(400).json({message: err.message})
+        }
     });
 
     chat = await chat

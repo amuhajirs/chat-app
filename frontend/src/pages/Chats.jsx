@@ -31,9 +31,6 @@ const Chats = () => {
             if(!(chats.find(c => c._id===newMessage.chat))) {
                 addChatToUser(newMessage.chat);
                 return
-            } else if (!(chats[0])) {
-                addChatToUser(newMessage.chat);
-                return
             }
     
             // Update latestMessage
