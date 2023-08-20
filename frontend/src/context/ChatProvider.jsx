@@ -4,28 +4,27 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const ChatContext = createContext();
 
 const ChatProvider = ({children}) => {
-    const [user, setUser] = useState({login: true});
+    const [user, setUser] = useState({login: false});
     const [friends, setFriends] = useState([]);
     const [chats, setChats] = useState([]);
     const [notif, setNotif] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        // Get user login info
+        const fetchUser = async () => {
+            await axios.get('/api/auth/loggedIn')
+                .then(res => {
+                    setUser({login: res.data.login, data: res.data.data});
+                })
+                .catch(() => {
+                    setUser({login: false});
+                })
+                .finally(() => setIsLoading(false));
+        }
+
         fetchUser();
     }, []);
-
-    // Get user login info and friends
-    const fetchUser = async () => {
-        await axios.get('/api/auth/loggedIn')
-            .then(res => {
-                setUser({login: res.data.login, data: res.data.data?.user});
-                setFriends(res.data.data?.friends || []);
-                setChats(res.data.data?.chats || []);
-            })
-            .catch(err => {
-                setUser({login: false});
-                console.error(err);
-            })
-    }
 
     return(
         <ChatContext.Provider value={{
@@ -38,7 +37,7 @@ const ChatProvider = ({children}) => {
             notif,
             setNotif
         }}>
-            {children}
+            {!isLoading && children}
         </ChatContext.Provider>
     );
 }

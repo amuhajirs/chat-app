@@ -179,7 +179,7 @@ export const kickFromGroup = async (req, res) => {
     res.json({message: 'User has been kicked'});
 }
 
-// GET /api/chats/:id
+// GET /api/chats/messages/:id
 export const history = async (req, res) => {
     const { id } = req.params;
     let messages;
@@ -195,7 +195,7 @@ export const history = async (req, res) => {
     res.json({data: messages});
 }
 
-// POST /api/chats/send
+// POST /api/chats/messages/send
 export const sendMessage = async (req, res) => {
     const { chat, text } = req.body;
 

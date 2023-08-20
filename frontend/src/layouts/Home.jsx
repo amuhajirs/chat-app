@@ -78,14 +78,16 @@ const Home = ()=>{
 
     inputEl.current.value = "";
 
-    if(selectedChat.isGroupChat) {
-      socket.emit('group message', message);
-    } else {
-      socket.emit('private message', {...message, recipient: selectedChat.users});
-    }
-
     await axios.post('/api/chats/messages/send', message)
+      .then(() => {
+        if(selectedChat.isGroupChat) {
+          socket.emit('group message', message);
+        } else {
+          socket.emit('private message', {...message, recipient: selectedChat.users});
+        }
+      })
       .catch(err => console.error(err));
+
   }
 
   return (
@@ -111,7 +113,7 @@ const Home = ()=>{
           </div>
 
           <div className='contact-content'>
-            <Outlet context={{selectedChat, setSelectedChat }} />
+            <Outlet context={{ selectedChat, setSelectedChat }} />
           </div>
 
           <div className='profile p-3'>

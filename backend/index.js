@@ -66,7 +66,7 @@ io.on('connection', socket => {
         io.to(message.chat).emit('receive message', message);
     });
 
-    socket.on('private message', message => {
+    socket.on('private message', message => {   
         io.to(message.recipient[0]._id).to(message.recipient[1]._id).emit('receive message', message);
     });
 

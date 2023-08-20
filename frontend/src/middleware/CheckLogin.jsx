@@ -1,25 +1,45 @@
-import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { ChatState } from "../context/ChatProvider";
+import { useEffect, useState } from "react";
+import LoadingProgress from "../components/LoadingProgress";
+import axios from "axios";
 
 const CheckLogin = ({ type }) => {
-    const { user } = ChatState();
-    const navigate = useNavigate();
+    const { user, setChats, setFriends } = ChatState();
+    const [isLoading, setIsLoading] = useState(true);
+    const [progress, setProgress] = useState(0);
 
     useEffect(() => {
-        if(type==='auth') {
-            if(!user.login) {
-                navigate('/login');
-            }
-        } else {
-            if(user.login) {
-                navigate('/');
-            }
+      // Get user's chats and friends
+        const fetchData = async () => {
+            setIsLoading(true);
+
+            await axios.get('/api/auth/data', {
+                onDownloadProgress: (progressEvent) => {
+                    setProgress(progressEvent.progress)
+                }
+            })
+            .then(res => {
+                setChats(res.data.data?.chats || []);
+                setFriends(res.data.data?.friends || []);
+            })
+            .catch(err => console.error(err))
+            .finally(() => setTimeout(() => {setIsLoading(false)}, 200) );
         }
-    });
+
+        if(type==='auth' && user.login) {
+            fetchData();
+        }
+    }, [type, user, setChats, setFriends]);
+    
 
     return (
-        <Outlet />
+        type==='auth' ?
+            (user.login ? ( isLoading ?
+                <LoadingProgress progress={progress} /> :
+                <Outlet />
+            ) : <Navigate to="/login" />) :
+            (!user.login ? <Outlet /> : <Navigate to='/' />)
     )
 }
 

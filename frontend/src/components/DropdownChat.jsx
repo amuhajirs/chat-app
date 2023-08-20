@@ -12,6 +12,7 @@ const DropdownChat = ({chat}) => {
 
     const deleteConfirmModal = useRef();
 
+    // remove chat
     const deleteChat = async () => {
         setIsLoading(true);
         await axios.put('/api/chats/remove', {chatId})

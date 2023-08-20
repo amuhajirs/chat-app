@@ -24,6 +24,7 @@ function App() {
       <ChatProvider>
         <Suspense fallback={<Loading />}>
           <Routes>
+            {/* Authenticated User */}
             <Route element={<CheckLogin type='auth' />}>
               <Route element={<Home />}>
                 <Route path='/' element={<Chats />} />
@@ -31,12 +32,15 @@ function App() {
                 <Route path='/notification' element={<Notification />} />
               </Route>
             </Route>
+
+            {/* Guest User */}
             <Route element={<CheckLogin type='guest' />}>
               <Route path='/login' element={<Login />} />
               <Route path='/register' element={<Register />} />
               <Route path='/forgot' element={<Forgot />} />
               <Route path='/reset/:token' element={<Reset />} />
             </Route>
+
             <Route path='*' element={<Custom404 />} />
           </Routes>
         </Suspense>

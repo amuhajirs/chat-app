@@ -37,27 +37,7 @@ export const login = async (req, res)=>{
             {email: emailUsername},
             {username: emailUsername}
         ]
-    }).populate('friends', ['-password', '-friends', '-chats'])
-    .populate({
-        path: 'chats',
-        populate: {
-            path: 'users groupAdmin',
-            select: ['-password', '-friends', '-chats']
-        }
-    })
-    .populate({
-        path: 'chats',
-        populate: {
-            path: 'latestMessage',
-            populate: {
-                path: 'sender',
-                select: ['-password', '-friends', '-chats']
-            }
-        },
-        options: {
-            sort: {updatedAt: -1}
-        }
-    });
+    }).select(['-chats', '-friends']);
 
     if(!user){
         return res.status(401).json({message: 'Bad Credentials'});
@@ -83,17 +63,9 @@ export const login = async (req, res)=>{
         secure: process.env.NODE_ENV==='production',
     });
 
-    const data = {
-        user,
-        friends: user.friends,
-        chats: user.chats
-    }
+    user.password = undefined;
 
-    data.user.password = undefined;
-    data.user.friends = undefined
-    data.user.chats = undefined
-
-    res.json({login: true, data: data});
+    res.json({login: true, data: user});
 }
 
 // POST /api/auth/forgot
@@ -181,44 +153,56 @@ export const loggedIn = async (req, res)=>{
         try {
             const decoded = jwt.verify(token, process.env.JWT_KEY);
             const user = await User.findById(decoded._id)
-                .populate('friends', ['-password', '-friends', '-chats'])
-                .populate({
-                    path: 'chats',
-                    populate: {
-                        path: 'users groupAdmin',
-                        select: ['-password', '-friends', '-chats']
-                    }
-                })
-                .populate({
-                    path: 'chats',
-                    populate: {
-                        path: 'latestMessage',
-                        populate: {
-                            path: 'sender',
-                            select: ['-password', '-friends', '-chats']
-                        }
-                    },
-                    options: {
-                        sort: {updatedAt: -1}
-                    }
-                })
-                .select('-password');
+                .select(['-password', '-chats', '-friends']);
 
-            const data = {
-                user,
-                friends: user.friends,
-                chats: user.chats
-            }
-
-            data.user.password = undefined;
-            data.user.friends = undefined
-            data.user.chats = undefined
-
-            res.json({login: true, data: data});
+            res.json({login: true, data: user});
         } catch (err) {
-            res.json({login: false, message: err.message});
+            res.status(401).json({login: false, message: err.message});
         }
     } else {
-        res.json({login: false});
+        res.status(401).json({login: false});
     }
 };
+
+// GET /api/auth/data
+export const getData = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id)
+            .populate('friends', ['-password', '-friends', '-chats'])
+            .populate({
+                path: 'chats',
+                populate: {
+                    path: 'users groupAdmin',
+                    select: ['-password', '-friends', '-chats']
+                }
+            })
+            .populate({
+                path: 'chats',
+                populate: {
+                    path: 'latestMessage',
+                    populate: {
+                        path: 'sender',
+                        select: ['-password', '-friends', '-chats']
+                    }
+                },
+                options: {
+                    sort: {updatedAt: -1}
+                }
+            })
+            .select('-password');
+
+        const data = {
+            user,
+            friends: user.friends,
+            chats: user.chats
+        }
+
+        data.user.password = undefined;
+        data.user.friends = undefined
+        data.user.chats = undefined
+
+        res.json({login: true, data: data});
+    } catch (err) {
+        res.status(401).json({login: false, message: err.message});
+    }
+}

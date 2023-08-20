@@ -22,6 +22,7 @@ const Chats = () => {
     }, [chats]);
 
     useEffect(() => {
+        // Add chat
         const addChatToUser = async (chatId) => {
             await axios.put('/api/chats/add', {chatId})
                 .then(res => setChats([res.data.data, ...chats]))
@@ -74,7 +75,7 @@ const Chats = () => {
             if (c.isGroupChat) {
                 return c.chatName.match(re);
             } else {
-                if (c.users[0].username !== user.data?.username) {
+                if (c.users[1].username !== user.data?.username) {
                     return c.users[1].username.match(re);
                 } else {
                     return c.users[0].username.match(re);
