@@ -3,25 +3,36 @@ import User from '../model/User.js';
 import bcrypt from 'bcrypt';
 import ResetPasswordEmail from '../config/resetPasswordEmail.js';
 import ResetToken from '../model/ResetToken.js';
+import { v2 as cloudinary } from 'cloudinary'
 
 // POST /api/auth/register
 export const register = async (req, res)=>{
     const { email, username, password } = req.body;
     let error = {};
 
+    if(!email || !username || !password) {
+        if(req.file) {
+            cloudinary.api.delete_resources([req.file.filename]);
+        }
+        return res.status(400).json({message: 'email, username, password field must be filled'});
+    }
+
     const checkEmail = await User.findOne({email});
     const checkUsername = await User.findOne({username});
 
     if(checkEmail){
-        error.email = 'Email already exists'
+        error.email = 'Email already exists';
     }
     if(checkUsername){
-        error.username = 'Username already exists'
+        error.username = 'Username already exists';
     };
 
     try {
-        await User.create({email, username, password});
+        await User.create({email, username, password, avatar: req.file ? req.file.path : undefined});
     } catch (err) {
+        if(req.file) {
+            cloudinary.api.delete_resources([req.file.filename]);
+        }
         return res.status(400).json({message: error});
     }
 
@@ -66,6 +77,57 @@ export const login = async (req, res)=>{
     user.password = undefined;
 
     res.json({login: true, data: user});
+}
+
+// PATCH /api/auth/update
+export const updateUser = async (req, res) => {
+    const { username, email, currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user._id).select(['-chats', '-friends']);
+
+    const data = {};
+
+    if(username) {
+        data.username = username;
+    }
+
+    if(email) {
+        data.email = email;
+    }
+
+    if(newPassword) {
+        // Check Password
+        const checkPassword = await bcrypt.compare(currentPassword, user.password);
+        
+        if(!checkPassword){
+            return res.status(401).json({message: 'Wrong Password'});
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        data.password = await bcrypt.hash(password, salt);
+    }
+
+    if(req.file) {
+        data.avatar = req.file.path;
+    }
+
+    try {
+        await user.updateOne(data);
+    } catch (err) {
+        if(req.file) {
+            cloudinary.api.delete_resources([req.file.filename]);
+        }
+        return res.status(400).json({message: err.message});
+    }
+
+    const updatedUser = user.toObject();
+    for (const [k, v] of Object.entries(data)) {
+        updatedUser[k] = v;
+    }
+
+    delete updatedUser.password;
+
+    res.json({message: 'Updated', data: updatedUser});
 }
 
 // POST /api/auth/forgot

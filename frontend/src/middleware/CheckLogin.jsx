@@ -27,10 +27,10 @@ const CheckLogin = ({ type }) => {
             .finally(() => setTimeout(() => {setIsLoading(false)}, 200) );
         }
 
-        if(type==='auth' && user.login) {
+        if(type==='auth') {
             fetchData();
         }
-    }, [type, user, setChats, setFriends]);
+    }, [type, setChats, setFriends]);
     
 
     return (

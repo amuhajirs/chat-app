@@ -48,8 +48,8 @@ function Register() {
                     navigate('/login');
                 })
                 .catch(err=>{
-                    formik.errors.email = err.response.data.error.email;
-                    formik.errors.username = err.response.data.error.username;
+                    formik.errors.email = err.response?.data.error.email;
+                    formik.errors.username = err.response?.data.error.username;
                 })
                 .finally(()=>setIsLoading(false));
         }
@@ -71,7 +71,7 @@ function Register() {
 
                     <div className="row">
                         <div className="col">
-                            <form method="POST" onSubmit={formik.handleSubmit} className="mb-3">
+                            <form onSubmit={formik.handleSubmit} className="mb-3">
 
                                     <div className="field-theme pb-4">
                                         <input type="text"

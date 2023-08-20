@@ -8,6 +8,7 @@ import { ChatState } from '../context/ChatProvider';
 import ChatContent from '../components/ChatContent';
 
 import send from '../assets/send.svg';
+import ProfileModal from '../components/ProfileModal';
 
 const Home = ()=>{
   const { user, setUser, chats, setChats, setFriends } = ChatState();
@@ -44,7 +45,7 @@ const Home = ()=>{
   }, [user]);
 
   useEffect(() => {
-    // Join to all chats room
+    // Join to all group chats room
     const chatsId = chats.filter(c => c.isGroupChat).map(c => c._id);
     socket.emit('join rooms', chatsId);
   }, [chats]);
@@ -91,6 +92,7 @@ const Home = ()=>{
   }
 
   return (
+    <>
     <div className='container-fluid bg-theme-primary rounded-2'>
       <div className="row">
 
@@ -117,7 +119,7 @@ const Home = ()=>{
           </div>
 
           <div className='profile p-3'>
-            <div className='d-flex column-gap-2 align-items-center'>
+            <div className='d-flex column-gap-2 align-items-center' data-bs-toggle="modal" data-bs-target="#profileModal" style={{cursor: 'pointer'}}>
               <img src={user.data?.avatar} alt="" height='40px' />
               <span>{user.data?.username}</span>
               <sup><i className="fa-solid fa-pen-to-square"></i></sup>
@@ -183,6 +185,9 @@ const Home = ()=>{
 
       </div>
     </div>
+
+    <ProfileModal />
+    </>
   )
 }
 
