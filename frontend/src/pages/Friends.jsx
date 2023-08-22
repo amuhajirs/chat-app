@@ -78,13 +78,13 @@ const Friends = () => {
         <>
             <div className='search d-flex justify-content-between align-items-center px-2 py-2 gap-1' style={{height: '60px'}}>
                 <div className='position-relative w-100'>
-                    <label htmlFor="search" className='position-absolute top-50 unselectable' style={{left: '15px', translate: '0 -50%'}}>
+                    <label htmlFor="search" className='position-absolute top-50 user-select-none' style={{left: '15px', translate: '0 -50%'}}>
                         <i className="fa-solid fa-magnifying-glass text-secondary" style={{fontSize: '15px'}}></i>
                     </label>
                     <input type="search" id='search' className='input-theme ps-5 rounded-pill' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} onChange={(e)=>searchFriends(e.target.value)} />
                 </div>
                 <button className='cool-btn' data-bs-toggle="modal" data-bs-target="#addFriendModal" onClick={()=>setTimeout(()=>{searchAddEl.current?.focus()}, 500)}>
-                    <i className="fa-solid fa-user-plus unselectable" style={{fontSize: '15px'}}></i>
+                    <i className="fa-solid fa-user-plus user-select-none" style={{fontSize: '15px'}}></i>
                 </button>
             </div>
 
@@ -115,7 +115,7 @@ const Friends = () => {
                             <div className="sticky-top bg-theme-primary pt-3">
                                 <form onSubmit={searchAddSubmit}>
                                     <div className='position-relative w-100'>
-                                        <label htmlFor="search-add" className='position-absolute top-50 unselectable' style={{left: '15px', translate: '0 -50%'}}>
+                                        <label htmlFor="search-add" className='position-absolute top-50 user-select-none' style={{left: '15px', translate: '0 -50%'}}>
                                             <i className="fa-solid fa-magnifying-glass text-secondary" style={{fontSize: '15px'}}></i>
                                         </label>
                                         <input type="search" id='search-add' ref={searchAddEl} className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} autoComplete="off" onChange={(e)=>setSearchAdd(e.target.value)} />
@@ -126,7 +126,7 @@ const Friends = () => {
                             {searchAddResult[0] ? (searchAddResult.map(u=>(
                             <div key={u._id}>
                                 <div className="d-flex justify-content-start align-items-center gap-2 py-2" style={{height: '70px'}}>
-                                    <img src={u.avatar} alt="" style={{height: '100%'}} />
+                                    <img src={u.avatar} alt="" style={{height: '100%', aspectRatio: '1/1', objectFit: 'cover'}} />
                                     <h6>{u.username}</h6>
                                         {!friends?.find(f => f._id === u._id) ? (
                                         <button className="btn btn-primary ms-auto" onClick={()=>handleEditFriends(u._id)}>

@@ -168,6 +168,21 @@ p{
     border-radius: 0 7px 7px 0;
 }
 
+.change-avatar {
+    cursor: pointer;
+}
+
+.change-avatar > div{
+    background-color: rgba(255, 255, 255, 0.4);
+    height: 0;
+    transition: height 200ms;
+}
+
+.change-avatar:hover > div {
+    height: 60px;
+    transition: height 200ms;
+}
+
 /* End of Chat */
 
 /* Person */
@@ -215,6 +230,9 @@ p{
 }
 .person-avatar>img {
     height: 100%;
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
 }
 
 .online{

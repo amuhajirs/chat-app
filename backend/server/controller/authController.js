@@ -85,14 +85,23 @@ export const updateUser = async (req, res) => {
 
     const user = await User.findById(req.user._id).select(['-chats', '-friends']);
 
-    const data = {};
+    if(req.file) {
+        // Delete previous avatar from cloudinary
+        if(user.avatar!=='/default-avatar') {
+            const index = user.avatar.indexOf('chatapp/profile');
+            console.log(user.avatar.slice(index));
+            cloudinary.api.delete_resources([user.avatar.slice(index)]);
+        }
+
+        user.avatar = process.env.CLOUD_URL + req.file.filename;
+    }
 
     if(username) {
-        data.username = username;
+        user.username = username;
     }
 
     if(email) {
-        data.email = email;
+        user.email = email;
     }
 
     if(newPassword) {
@@ -104,15 +113,11 @@ export const updateUser = async (req, res) => {
         }
 
         const salt = await bcrypt.genSalt(10);
-        data.password = await bcrypt.hash(password, salt);
-    }
-
-    if(req.file) {
-        data.avatar = req.file.path;
+        user.password = await bcrypt.hash(password, salt);
     }
 
     try {
-        await user.updateOne(data);
+        await user.save();
     } catch (err) {
         if(req.file) {
             cloudinary.api.delete_resources([req.file.filename]);
@@ -120,14 +125,26 @@ export const updateUser = async (req, res) => {
         return res.status(400).json({message: err.message});
     }
 
-    const updatedUser = user.toObject();
-    for (const [k, v] of Object.entries(data)) {
-        updatedUser[k] = v;
+    user.password = undefined;
+
+    res.json({data: user});
+}
+
+// DELETE /api/auth/delete-avatar
+export const deleteAvatar = async (req, res) => {
+    const user = await User.findById(req.user._id).select(['-chats', '-friends']);
+
+    // Delete previous avatar from cloudinary
+    if(user.avatar!=='/default-avatar') {
+        const index = user.avatar.indexOf('chatapp/profile');
+        console.log(user.avatar.slice(index));
+        cloudinary.api.delete_resources([user.avatar.slice(index)]);
     }
 
-    delete updatedUser.password;
+    user.avatar = '/default-avatar.png';
+    await user.save();
 
-    res.json({message: 'Updated', data: updatedUser});
+    res.json({data: user});
 }
 
 // POST /api/auth/forgot

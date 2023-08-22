@@ -9,6 +9,7 @@ import ChatContent from '../components/ChatContent';
 
 import send from '../assets/send.svg';
 import ProfileModal from '../components/ProfileModal';
+import { showChat } from '../config/ChatLogics';
 
 const Home = ()=>{
   const { user, setUser, chats, setChats, setFriends } = ChatState();
@@ -120,7 +121,7 @@ const Home = ()=>{
 
           <div className='profile p-3'>
             <div className='d-flex column-gap-2 align-items-center' data-bs-toggle="modal" data-bs-target="#profileModal" style={{cursor: 'pointer'}}>
-              <img src={user.data?.avatar} alt="" height='40px' />
+              <img src={user.data?.avatar} alt="" style={{height: '40px', borderRadius: '50%', aspectRatio: '1/1', objectFit: 'cover'}} />
               <span>{user.data?.username}</span>
               <sup><i className="fa-solid fa-pen-to-square"></i></sup>
             </div>
@@ -138,15 +139,12 @@ const Home = ()=>{
             <div className='recipient p-3'>
               {!messageIsLoading ? (
                 <>
-                  <img src={selectedChat.isGroupChat ? '/default-group.jpg' : '/default-avatar.png'} className='rounded-circle' alt="" height='40px' />
-                  <span>{(selectedChat.isGroupChat) ?
-                  (selectedChat.chatName) : (selectedChat.users[0].username===user.data?.username) ?
-                  (selectedChat.users[1].username) : 
-                  (selectedChat.users[0].username)}</span>
+                  <img src={selectedChat.isGroupChat ? '/default-group.jpg' : (showChat(selectedChat, user.data?.username).avatar)} alt="" style={{height: '40px', objectFit: 'cover', aspectRatio: '1/1', borderRadius: '50%'}} />
+                  <span>{(selectedChat.isGroupChat) ? (selectedChat.chatName) : (showChat(selectedChat, user.data?.username).username)}</span>
                 </>
                 ) : (
                 <>
-                  <img src='/default-avatar.png' alt="" height='40px' />
+                  <img src={selectedChat.isGroupChat ? '/default-group.jpg' : '/default-avatar'} alt="" style={{height: '40px', objectFit: 'cover', aspectRatio: '1/1', borderRadius: '50%'}} />
                   <div className='w-100 placeholder-glow'>
                     <span className='placeholder col-lg-1 col-3'></span>
                   </div>
@@ -175,8 +173,8 @@ const Home = ()=>{
           ) : (
           <>
           <div className='d-flex justify-content-center align-items-center flex-column gap-4' style={{height: '100%', backgroundColor: 'black'}}>
-            <i className="fa-solid fa-message text-center unselectable" style={{fontSize: '100px', color: 'gray'}}></i>
-            <h1 className='unselectable' style={{color: 'gray'}}>Start Conversation</h1>
+            <i className="fa-solid fa-message text-center user-select-none" style={{fontSize: '100px', color: 'gray'}}></i>
+            <h1 className='user-select-none' style={{color: 'gray'}}>Start Conversation</h1>
           </div>
           </>
           )}

@@ -10,7 +10,7 @@ const GroupChat = ({ messages }) => {
             <div key={i} className={`d-flex ${isSameSender(messages, m, i) ? 'mb-3' : 'mb-1'}`}>
                 {(isSameSenderLast(messages, m, i, user.data?._id) || isLastMessage(messages, i, user.data?._id)) ? (
                 <div className='mt-auto'>
-                    <img src={m.sender.avatar} alt="" style={{aspectRatio: '1 / 1', width: '30px'}} />
+                    <img src={m.sender.avatar} alt="" style={{aspectRatio: '1 / 1', width: '30px', borderRadius: '50%', objectFit: 'cover'}} />
                 </div>) : (
                 <div style={{width: '30px'}}></div>)}
 

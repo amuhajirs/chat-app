@@ -5,7 +5,7 @@ import { socket } from "../socket";
 
 import { ChatState } from "../context/ChatProvider";
 import CreateGroupModal from "../components/CreateGroupModal";
-import { showLatestMessage } from "../config/ChatLogics";
+import { showChat, showLatestMessage } from "../config/ChatLogics";
 import DropdownChat from "../components/DropdownChat";
 
 const Chats = () => {
@@ -104,13 +104,11 @@ const Chats = () => {
         <div key={chat._id} className={`chat-wrapper ${selectedChat?._id===chat._id ? 'active' : ''}`}>
             <div className="cool-active"></div>
             <div className="chat" onClick={() => setSelectedChat(chat)}>
-                <img src={chat.isGroupChat ? '/default-group.jpg' : '/default-avatar.png'} className="rounded-circle" alt="" />
+                <img src={chat.isGroupChat ? '/default-group.jpg' : showChat(chat, user.data?.username).avatar} className="rounded-circle" alt="" />
                 <div className="d-flex align-items-center" style={{width: 'calc(100% - 20px - 50px)'}}>
                     <div style={{width: '100%'}}>
                         <p>{(chat.isGroupChat) ?
-                            (chat.chatName) : (chat.users[0].username===user.data?.username) ?
-                            (chat.users[1].username) :
-                            (chat.users[0].username)}
+                            (chat.chatName) : (showChat(chat, user.data?.username).username)}
                         </p>
                         <p style={{fontSize: '13px', textOverflow: 'ellipsis', width: '100%', whiteSpace: 'nowrap', overflow: 'hidden'}}>{showLatestMessage(chat, user.data?.username)}</p>
                     </div>

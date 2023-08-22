@@ -66,3 +66,10 @@ export const showLatestMessage = (chat, myUsername) => {
         )
     ))
 }
+
+// Show personal chat
+export const showChat = (chat, myUsername) => {
+    return (chat.users[0].username===myUsername) ?
+            (chat.users[1]) :
+            (chat.users[0])
+}
