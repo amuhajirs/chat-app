@@ -228,12 +228,6 @@ p{
     height: 100%;
     position: relative;
 }
-.person-avatar>img {
-    height: 100%;
-    border-radius: 50%;
-    aspect-ratio: 1/1;
-    object-fit: cover;
-}
 
 .online{
     aspect-ratio: 1/1;

@@ -1,20 +1,20 @@
 import { Router } from "express";
 import { register, login, forgot, reset, verify, logout, loggedIn, getData, updateUser, deleteAvatar } from "../controller/authController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
-import { upload } from "../config/multer.js";
+import { uploadAvatar } from "../config/multer.js";
 
 const router = Router();
 
 // /api/auth
 
 // Register user
-router.post('/register', upload.single('avatar'), register);
+router.post('/register', uploadAvatar.single('avatar'), register);
 
 // Login
 router.post('/login', login);
 
 // Update user
-router.patch('/update', authMiddleware, upload.single('avatar'), updateUser);
+router.patch('/update', authMiddleware, uploadAvatar.single('avatar'), updateUser);
 
 // Delete avatar
 router.delete('/delete-avatar', authMiddleware, deleteAvatar)

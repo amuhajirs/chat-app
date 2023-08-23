@@ -1,6 +1,7 @@
 import Chat from "../model/Chat.js";
 import Message from "../model/Message.js";
 import User from "../model/User.js";
+import { v2 as cloudinary } from "cloudinary";
 
 // GET /api/chats
 export const myChats = async (req, res) => {
@@ -80,29 +81,41 @@ export const accessPersonalChat = async (req, res) => {
 
 // POST /api/chats/group
 export const createGroup = async (req, res) => {
-    const { chatName, chatDesc, users } = req.body;
+    const { chatName, chatDesc } = req.body;
+
+    const users = req.file ? JSON.parse(req.body.users) : req.body.users;
 
     if(!users || !chatName) {
+        if(req.file) {
+            cloudinary.api.delete_resources([req.file.filename]);
+        }
         return res.status(400).json({message: 'users and chatName field must be filled'});
     }
 
     if(users.length < 2) {
+        if(req.file) {
+            cloudinary.api.delete_resources([req.file.filename]);
+        }
         return res.status(400).json({message: 'you need at least 3 users to create a group'});
     }
-
-    users.push(req.user._id);
 
     let chat;
 
     try {
+        users.push(req.user._id);
+
         chat = await Chat.create({
             chatName: chatName,
             chatDesc: chatDesc || '',
+            picture: req.file ? process.env.CLOUD_URL + req.file.filename : '/default-group.jpg',
             isGroupChat: true,
             groupAdmin: req.user._id,
             users: users
         });
     } catch (err) {
+        if(req.file) {
+            cloudinary.api.delete_resources([req.file.filename]);
+        }
         return res.status(500).json({message: err.message});
     }
 

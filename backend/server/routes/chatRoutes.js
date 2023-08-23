@@ -4,6 +4,7 @@ import {
     myChats,accessPersonalChat, createGroup, history, updateGroup, inviteToGroup, kickFromGroup, sendMessage,
     deletePersonalChat, deleteGroup, addChat, removeChat
 } from "../controller/chatController.js";
+import { uploadGroupPict } from '../config/multer.js';
 
 const router = Router();
 
@@ -14,7 +15,7 @@ router.get('/', authMiddleware, myChats)
 router.post('/', authMiddleware, accessPersonalChat);
 
 // Create Group chat
-router.post('/group', authMiddleware, createGroup);
+router.post('/group', authMiddleware, uploadGroupPict.single('picture'), createGroup);
 
 // Edit Group chat
 router.put('/group/update', authMiddleware, updateGroup);

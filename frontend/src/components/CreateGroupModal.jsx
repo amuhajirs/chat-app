@@ -7,6 +7,7 @@ const CreateGroupModal = () => {
     const { friends } = ChatState();
     const [friendResult, setFriendResult] = useState([]);
 
+    const [picture, setPicture] = useState(undefined);
     const [chatName, setChatName] = useState("");
     const [chatDesc, setChatDesc] = useState("");
     const [addUser, setAddUser] = useState("");
@@ -43,7 +44,7 @@ const CreateGroupModal = () => {
         setIsLoading(true);
         setError({});
 
-        let error = {}
+        let error = {};
         
         if(!chatName) {
             error.chatName = 'Group Name must be filled';
@@ -55,14 +56,27 @@ const CreateGroupModal = () => {
 
         setError(error);
 
-        const data = {
-            chatName,
-            chatDesc,
-            users: users.map(u => u._id)
-        };
+        let data;
+
+        if (picture) {
+            data = new FormData();
+            data.append('picture', picture);
+            data.append('chatName', chatName);
+            data.append('chatDesc', chatDesc);
+            data.append('users', JSON.stringify(users.map(u => u._id)));
+        } else {
+            data = {
+                picture: '/default-group.jpg',
+                chatName,
+                chatDesc,
+                users: users.map(u => u._id)
+            };
+        }
+
 
         await axios.post('/api/chats/group', data)
             .then(res => {
+                setPicture(undefined);
                 setChatName("");
                 setChatDesc("");
                 setAddUser("");
@@ -86,6 +100,26 @@ const CreateGroupModal = () => {
                     </div>
                     <div className="modal-body">
                         <form onSubmit={(e)=>createGroupSubmit(e)}>
+
+                            <div className="dropdown text-center mb-3 ">
+                                <div className="position-relative d-inline-block rounded-circle change-avatar" style={{overflow: 'hidden'}} data-bs-toggle="dropdown" aria-expanded="false">
+                                    {picture ? <img src={URL.createObjectURL(picture)} alt="" style={{width: '150px'}} className='avatar' /> :
+                                    <img src='/default-group.jpg' alt="" style={{width: '150px'}} className='avatar' />}
+                                    <div className="position-absolute bottom-0 start-50 w-100 rounded-circle" style={{transform: 'translate(-50%, 0)'}}>
+                                        <div className="text-black mt-3 fw-semibold">Change Picture</div>
+                                    </div>
+                                </div>
+                                <ul className="dropdown-menu dropdown-menu-dark dropdown-theme-primary">
+                                    <li>
+                                        <label role="button" htmlFor="input-avatar" className="dropdown-item">Upload Image</label>
+                                    </li>
+                                    <li>
+                                        <span role="button" className="dropdown-item">Default</span>
+                                    </li>
+                                </ul>
+                                <input id="input-avatar" type="file" accept="image/*" hidden onChange={(e) => setPicture(e.target.files[0])} />
+                            </div>
+
                             <div className="mb-3">
                                 <input type="text" className="input-theme rounded" placeholder="Group Name" value={chatName} onChange={(e) => setChatName(e.target.value)} />
                                 <span className='text-danger ms-1' style={{fontSize: '12px'}}>{error.chatName}</span>
@@ -116,7 +150,7 @@ const CreateGroupModal = () => {
                                     <div className='person'>
                                         <div className='person-avatar'>
                                             <div className={friend.online ? 'online' : 'offline'}></div>
-                                            <img src={friend.avatar} alt="" />
+                                            <img src={friend.avatar} alt="" className='avatar' style={{height: '100%'}} />
                                         </div>
                                         <div>
                                             <span>{friend.username}</span>

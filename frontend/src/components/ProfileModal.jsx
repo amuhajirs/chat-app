@@ -46,6 +46,8 @@ const ProfileModal = () => {
                 setNewPassword('');
             } else {
                 setIsEditPassword(true);
+                setCurrentPassword('');
+                setNewPassword('');
             }
         }
     }
@@ -81,18 +83,23 @@ const ProfileModal = () => {
         await axios.patch('/api/auth/update', data)
             .then(res => {
                 setUser({...user, data: res.data.data});
+
+                if(field==='username') {
+                    setIsEditUsername(false);
+                } else if (field==='email') {
+                    setIsEditEmail(false);
+                } else if (field==='password') {
+                    setIsEditPassword(false);
+                }
             })
             .catch(err => console.error(err))
             .finally(() => {
                 if(field==='username') {
                     setIsLoadingUsername(false);
-                    setIsEditUsername(false);
                 } else if (field==='email') {
                     setIsLoadingEmail(false);
-                    setIsEditEmail(false);
                 } else if (field==='password') {
                     setIsLoadingPassword(false);
-                    setIsEditPassword(false);
                 }
             });
     }
@@ -106,7 +113,6 @@ const ProfileModal = () => {
 
         await axios.patch('/api/auth/update', formData)
             .then(res => {
-                console.log(res.data)
                 setUser({...user, data: res.data.data});
             })
             .catch(err => console.error(err))
@@ -131,7 +137,7 @@ const ProfileModal = () => {
                             <div className="dropdown text-center mb-3 ">
                                 <div className="position-relative d-inline-block rounded-circle change-avatar" style={{overflow: 'hidden'}} data-bs-toggle="dropdown" aria-expanded="false">
                                     <img src={user.data?.avatar} alt="" style={{width: '150px', aspectRatio: '1/1', objectFit: 'cover'}} />
-                                    <div className="position-absolute bottom-0 start-50 w-100" style={{transform: 'translate(-50%, 0)'}}>
+                                    <div className="position-absolute bottom-0 start-50 w-100 rounded-circle" style={{transform: 'translate(-50%, 0)'}}>
                                         <div className="text-black mt-3 fw-semibold">Change Avatar</div>
                                     </div>
                                 </div>

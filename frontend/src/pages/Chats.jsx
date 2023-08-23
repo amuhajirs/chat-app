@@ -104,7 +104,7 @@ const Chats = () => {
         <div key={chat._id} className={`chat-wrapper ${selectedChat?._id===chat._id ? 'active' : ''}`}>
             <div className="cool-active"></div>
             <div className="chat" onClick={() => setSelectedChat(chat)}>
-                <img src={chat.isGroupChat ? '/default-group.jpg' : showChat(chat, user.data?.username).avatar} className="rounded-circle" alt="" />
+                <img src={chat.isGroupChat ? chat.picture : showChat(chat, user.data?.username).avatar} className="avatar" alt="" />
                 <div className="d-flex align-items-center" style={{width: 'calc(100% - 20px - 50px)'}}>
                     <div style={{width: '100%'}}>
                         <p>{(chat.isGroupChat) ?

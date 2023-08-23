@@ -12,4 +12,13 @@ const storage = new CloudinaryStorage({
     },
 });
 
-export const upload = multer({storage});
+const storage2 = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'chatapp/group',
+        public_id: (req, file) => path.parse(file.originalname).name + '-' + Date.now(),
+    },
+});
+
+export const uploadAvatar = multer({storage});
+export const uploadGroupPict = multer({storage: storage2});

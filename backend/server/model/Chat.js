@@ -5,6 +5,9 @@ const chatSchema = new Schema({
         type: Boolean,
         default: false
     },
+    picture: {
+        type: String
+    },
     chatName: {
         type: String,
         trim: true

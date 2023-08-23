@@ -101,3 +101,9 @@
     transition: all 200ms ease;
     background-color: var(--bg-hover);
 }
+
+.avatar {
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}

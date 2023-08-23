@@ -121,7 +121,7 @@ const Home = ()=>{
 
           <div className='profile p-3'>
             <div className='d-flex column-gap-2 align-items-center' data-bs-toggle="modal" data-bs-target="#profileModal" style={{cursor: 'pointer'}}>
-              <img src={user.data?.avatar} alt="" style={{height: '40px', borderRadius: '50%', aspectRatio: '1/1', objectFit: 'cover'}} />
+              <img src={user.data?.avatar} alt="" style={{height: '40px'}} className='avatar' />
               <span>{user.data?.username}</span>
               <sup><i className="fa-solid fa-pen-to-square"></i></sup>
             </div>
@@ -139,7 +139,7 @@ const Home = ()=>{
             <div className='recipient p-3'>
               {!messageIsLoading ? (
                 <>
-                  <img src={selectedChat.isGroupChat ? '/default-group.jpg' : (showChat(selectedChat, user.data?.username).avatar)} alt="" style={{height: '40px', objectFit: 'cover', aspectRatio: '1/1', borderRadius: '50%'}} />
+                  <img src={selectedChat.isGroupChat ? '/default-group.jpg' : (showChat(selectedChat, user.data?.username).avatar)} alt="" style={{height: '40px'}} className='avatar' />
                   <span>{(selectedChat.isGroupChat) ? (selectedChat.chatName) : (showChat(selectedChat, user.data?.username).username)}</span>
                 </>
                 ) : (

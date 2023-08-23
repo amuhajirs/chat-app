@@ -93,7 +93,7 @@ const Friends = () => {
                 <div className="person">
                     <div className='person-avatar'>
                         <div className={friend.online ? 'online' : 'offline'}></div>
-                        <img src={friend.avatar} alt="" />
+                        <img src={friend.avatar} alt="" className="avatar" style={{height: '100%'}} />
                     </div>
                     <div>
                         <span>{friend.username}</span>
@@ -126,7 +126,7 @@ const Friends = () => {
                             {searchAddResult[0] ? (searchAddResult.map(u=>(
                             <div key={u._id}>
                                 <div className="d-flex justify-content-start align-items-center gap-2 py-2" style={{height: '70px'}}>
-                                    <img src={u.avatar} alt="" style={{height: '100%', aspectRatio: '1/1', objectFit: 'cover'}} />
+                                    <img src={u.avatar} alt="" style={{height: '100%'}} className="avatar" />
                                     <h6>{u.username}</h6>
                                         {!friends?.find(f => f._id === u._id) ? (
                                         <button className="btn btn-primary ms-auto" onClick={()=>handleEditFriends(u._id)}>
