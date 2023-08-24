@@ -3,13 +3,9 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 
 const userSchema = new Schema({
-    email: {
+    displayName: {
         type: String,
-        required: 'Email address is required',
-        unique: true,
-        trim: true,
-        lowercase: true,
-        validate: [validator.isEmail, 'invalid email'],
+        required: 'Display Name is required'
     },
     username: {
         type: String,
@@ -18,9 +14,17 @@ const userSchema = new Schema({
         trim: true,
         lowercase: true,
     },
+    email: {
+        type: String,
+        required: 'Email address is required',
+        unique: true,
+        trim: true,
+        lowercase: true,
+        validate: [validator.isEmail, 'invalid email'],
+    },
     avatar: {
         type: String,
-        default: '/default-avatar.png'
+        default: '/default-avatar.jpg'
     },
     password: {
         type: String,

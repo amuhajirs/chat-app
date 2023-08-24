@@ -163,7 +163,7 @@ const Home = ()=>{
                 <button type='button' className='cool-btn'>
                   <i className="fa-solid fa-paperclip"></i>
                 </button>
-                <input id='inputEl' ref={inputEl} className='input-theme' type="text" placeholder='Type your message' autoComplete="off" />
+                <input id='inputEl' ref={inputEl} className='input-theme w-100' type="text" placeholder='Type your message' autoComplete="off" />
                 <button type='submit' className='cool-btn'>
                   <img src={send} alt=""  />
                 </button>

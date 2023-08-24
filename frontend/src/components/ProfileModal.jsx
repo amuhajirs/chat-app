@@ -136,7 +136,7 @@ const ProfileModal = () => {
                         <div>
                             <div className="dropdown text-center mb-3 ">
                                 <div className="position-relative d-inline-block rounded-circle change-avatar" style={{overflow: 'hidden'}} data-bs-toggle="dropdown" aria-expanded="false">
-                                    <img src={user.data?.avatar} alt="" style={{width: '150px', aspectRatio: '1/1', objectFit: 'cover'}} />
+                                    <img src={user.data?.avatar} alt="" style={{width: '150px'}} className="avatar" />
                                     <div className="position-absolute bottom-0 start-50 w-100 rounded-circle" style={{transform: 'translate(-50%, 0)'}}>
                                         <div className="text-black mt-3 fw-semibold">Change Avatar</div>
                                     </div>

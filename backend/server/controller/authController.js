@@ -2,45 +2,115 @@ import jwt from 'jsonwebtoken';
 import User from '../model/User.js';
 import bcrypt from 'bcrypt';
 import ResetPasswordEmail from '../config/resetPasswordEmail.js';
-import ResetToken from '../model/ResetToken.js';
+import Token from '../model/Token.js';
 import { v2 as cloudinary } from 'cloudinary'
+import VerifyEmailEmail from '../config/verifyEmailEmail.js';
 
 // POST /api/auth/register
-export const register = async (req, res)=>{
-    const { email, username, password } = req.body;
+export const register = async (req, res) => {
+    const { displayName, email, username, password } = req.body;
     let error = {};
 
-    if(!email || !username || !password) {
+    if(!displayName || !email || !username || !password) {
         if(req.file) {
             cloudinary.api.delete_resources([req.file.filename]);
         }
-        return res.status(400).json({message: 'email, username, password field must be filled'});
+        return res.status(400).json({message: 'displayName, email, username, and field must be filled'});
     }
 
-    const checkEmail = await User.findOne({email});
     const checkUsername = await User.findOne({username});
+    const checkEmail = await User.findOne({email});
 
+    if(checkUsername){
+        error.username = 'Username already exists';
+    }
     if(checkEmail){
         error.email = 'Email already exists';
     }
-    if(checkUsername){
-        error.username = 'Username already exists';
-    };
+
+    if(Object.keys(error).length > 0) {
+        if(req.file) {
+            cloudinary.api.delete_resources([req.file.filename]);
+        }
+        return res.json({succeed: false, message: error});
+    }
 
     try {
-        await User.create({email, username, password, avatar: req.file ? req.file.path : undefined});
+        await User.create({
+            displayName,
+            email,
+            username,
+            password,
+            avatar: req.file ? process.env.CLOUD_URL + req.file.filename : undefined
+        });
     } catch (err) {
         if(req.file) {
             cloudinary.api.delete_resources([req.file.filename]);
         }
-        return res.status(400).json({message: error});
+        return res.status(400).json({message: err});
     }
 
-    res.json({message: 'Register success'});
+    res.json({succeed: true, message: 'Register success',});
+}
+
+// POST /api/auth/verify-email/generate
+export const generateVerifyEmail = async (req, res) => {
+    const { email, username } = req.body;
+    let error = {};
+
+    if(!email || !username) {
+        return res.status(400).json({message: 'email and username field must be filled'});
+    }
+
+    const checkUsername = await User.findOne({username});
+    const checkEmail = await User.findOne({email});
+
+    if(checkUsername){
+        error.username = 'Username already exists';
+    }
+    if(checkEmail){
+        error.email = 'Email already exists';
+    }
+
+    if(Object.keys(error).length > 0) {
+        return res.json({succeed: false, message: error});
+    }
+
+    // Generate OTP
+    var digits = '0123456789';
+    let OTP = '';
+    for (let i = 0; i < 4; i++ ) {
+        OTP += digits[Math.floor(Math.random() * 10)];
+    }
+
+    // Send OTP to email
+    await VerifyEmailEmail(email, OTP);
+
+    try {
+        await Token.deleteOne({email});
+        await Token.create({token: OTP, email, expireAt: new Date(Date.now() + (30 * 1000))});
+    } catch (err) {
+        return res.status(400).json({message: err});
+    }
+
+    res.json({succeed: true, message: 'OTP has been sent to the email'});
+}
+
+// POST /api/auth/verify-email
+export const verifyEmail = async (req, res) => {
+    const { email, otp } = req.body;
+
+    const checkOtp = await Token.findOne({email});
+
+    if(otp!==checkOtp?.token) {
+        return res.json({isCorrect: false, message: 'OTP code wrong'});
+    }
+
+    res.json({isCorrect: true, message: 'OTP code correct'});
 }
 
 // POST /api/auth/login
-export const login = async (req, res)=>{
+export const login = async (req, res) => {
     const { emailUsername, password } = req.body;
 
     let user = await User.findOne({
@@ -65,7 +135,7 @@ export const login = async (req, res)=>{
     const token = jwt.sign(
         {_id: user._id, username: user.username},
         process.env.JWT_KEY,
-        {expiresIn: '30d'}
+        {expiresIn: '90d'}
     );
 
     // Set Cookie
@@ -87,7 +157,7 @@ export const updateUser = async (req, res) => {
 
     if(req.file) {
         // Delete previous avatar from cloudinary
-        if(user.avatar!=='/default-avatar') {
+        if(user.avatar!=='/default-avatar.jpg') {
             const index = user.avatar.indexOf('chatapp/profile');
             console.log(user.avatar.slice(index));
             cloudinary.api.delete_resources([user.avatar.slice(index)]);
@@ -135,13 +205,13 @@ export const deleteAvatar = async (req, res) => {
     const user = await User.findById(req.user._id).select(['-chats', '-friends']);
 
     // Delete previous avatar from cloudinary
-    if(user.avatar!=='/default-avatar') {
+    if(user.avatar!=='/default-avatar.jpg') {
         const index = user.avatar.indexOf('chatapp/profile');
         console.log(user.avatar.slice(index));
         cloudinary.api.delete_resources([user.avatar.slice(index)]);
     }
 
-    user.avatar = '/default-avatar.png';
+    user.avatar = '/default-avatar.jpg';
     await user.save();
 
     res.json({data: user});
@@ -149,8 +219,13 @@ export const deleteAvatar = async (req, res) => {
 
 // POST /api/auth/forgot
 export const forgot = async (req, res)=>{
-    const {email} = req.body
-    const user = await User.findOne({email: email});
+    const { email } = req.body
+
+    if(!email) {
+        return res.status(400).json({message: 'email field must be filled'});
+    }
+
+    const user = await User.findOne({email});
 
     if(!user){
         return res.json({message: 'Account not found'});
@@ -164,8 +239,9 @@ export const forgot = async (req, res)=>{
     );
 
     try {
+        // Send link to email
         await ResetPasswordEmail(user.username, user.email, req.get('host'), token);
-        await ResetToken.create({token});
+        await Token.create({token, expireAt: new Date(Date.now() + (60 * 60 * 1000) )});
     } catch (err) {
         return res.status(500).json({message: err.message});
     }
@@ -173,10 +249,10 @@ export const forgot = async (req, res)=>{
     res.json({message: `link has been sent to ${email}`});
 }
 
-// POST /api/auth/verify
-export const verify = async (req, res)=>{
-    const token = req.body.token;
-    const verify = await ResetToken.findOne({token});
+// POST /api/auth/verify-token
+export const verifyToken = async (req, res)=>{
+    const { token } = req.body;
+    const verify = await Token.findOne({token});
 
     if(token && verify){
         try {
@@ -193,7 +269,7 @@ export const verify = async (req, res)=>{
 // POST /api/auth/reset
 export const reset = async (req, res)=>{
     const {token, password} = req.body;
-    const verify = await ResetToken.findOne({token});
+    const verify = await Token.findOne({token});
 
     if(verify){
         try {

@@ -1,3 +1,10 @@
+:root {
+    --bg-primary: rgb(27, 27, 27);
+    --bg-hover: rgb(60, 60, 60);
+    --bg-active: rgb(35, 35, 35);
+    --height: 100vh;
+}
+
 /* Theme */
 .bg-theme-primary {
     background-color: var(--bg-primary);
@@ -21,7 +28,7 @@
 
 .field-theme>label{
     position: absolute;
-    top: 32%;
+    top: 50%;
     left: 20px;
     translate: 0 -50%;
     cursor: text;
@@ -45,7 +52,6 @@
 
 .input-theme{
     background-color: var(--bg-hover);
-    width: 100%;
     padding: 8px 20px;
     border-radius: 10px;
     color: white;
@@ -73,15 +79,7 @@
     color: red;
     font-size: 12px;
     left: 0;
-    bottom: 5px;
-}
-
-.input-theme:-webkit-autofill,
-.input-theme:-webkit-autofill:hover, 
-.input-theme:-webkit-autofill:focus, 
-.input-theme:-webkit-autofill:active{
-    -webkit-transition: "color 9999s ease-out, background-color 9999s ease-out";
-    -webkit-transition-delay: 9999s;
+    bottom: -18px;
 }
 
 .cool-btn {

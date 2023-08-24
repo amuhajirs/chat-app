@@ -29,31 +29,27 @@ const Forgot = () => {
             <Link to='/login' className="cool-btn bg-theme-primary" style={{position: 'absolute', top: '40px'}}>
                 <i className="fa-solid fa-arrow-left"></i>
             </Link>
-            <div className="row justify-content-center align-items-center" style={{height: '100%'}}>
-                <div className="col-lg-5 col-md-7 col-sm-12 bg-theme-primary rounded-2 p-4">
+            <div className="d-flex justify-content-center align-items-center" style={{height: '100%'}}>
+                <div className="bg-theme-primary rounded-2 p-4" style={{width: '480px'}}>
 
-                    <div className="row mb-4">
-                        <div className="col">
-                            <h1 className="text-center fw-bold">Forgot Password</h1>
-                        </div>
+                    <div className="mb-4">
+                        <h1 className="text-center fw-bold">Forgot Password</h1>
                     </div>
 
-                    <div className="row">
-                        <div className="col">
-                            <form method="POST" onSubmit={handleSubmit} className="mb-3">
-                                <div className="mb-3">
-                                    <p className="text-center">Enter your email and we will send you a link via email to reset your password. <b>Dont</b> share it with anyone else.</p>
-                                </div>
-                                <div className="pb-4 field-theme">
-                                    <input type="text" className="input-theme rounded-pill" id="email" onChange={(e)=>setEmail(e.target.value)} required />
-                                    <label htmlFor="email">Email</label>
-                                </div>
-                                {!isLoading ? (
-                                <button type="submit" className="btn btn-primary w-100 rounded-pill">Send Link</button>) : (
-                                <button type="submit" className="btn btn-primary w-100 rounded-pill" disabled>Sending...</button>
-                                )}
-                            </form>
-                        </div>
+                    <div className="mb-3">
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-3">
+                                <p className="text-center">Enter your email and we will send you a link via email to reset your password. <b>Dont</b> share it with anyone else.</p>
+                            </div>
+                            <div className="mb-4 field-theme">
+                                <input type="text" className="input-theme rounded-2 w-100" id="email" onChange={(e)=>setEmail(e.target.value)} required />
+                                <label htmlFor="email">Email</label>
+                            </div>
+                            {!isLoading ? (
+                            <button type="submit" className="btn btn-primary w-100 rounded-2">Send Link</button>) : (
+                            <button type="submit" className="btn btn-primary w-100 rounded-2" disabled>Sending...</button>
+                            )}
+                        </form>
                     </div>
 
                 </div>

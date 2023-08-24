@@ -107,7 +107,7 @@ export const createGroup = async (req, res) => {
         chat = await Chat.create({
             chatName: chatName,
             chatDesc: chatDesc || '',
-            picture: req.file ? process.env.CLOUD_URL + req.file.filename : '/default-group.jpg',
+            picture: req.file ? process.env.CLOUD_URL + req.file.filename : undefined,
             isGroupChat: true,
             groupAdmin: req.user._id,
             users: users

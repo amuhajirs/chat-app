@@ -1,9 +1,3 @@
-:root {
-    --bg-primary: rgb(27, 27, 27);
-    --bg-hover: rgb(60, 60, 60);
-    --height: 100vh;
-}
-
 body {
     background-color: black;
 }
@@ -22,6 +16,13 @@ p{
 
 ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.4);
+}
+
+.otp {
+    width: 75px;
+    height: 75px;
+    font-size: 50px;
+    text-align: center;
 }
 
 /* Contact */
@@ -121,8 +122,9 @@ p{
     cursor: pointer;
 }
 
-.chat-wrapper:hover {
-    background-color: var(--bg-hover);
+.chat-wrapper {
+    width: 100%;
+    position: relative;
 }
 
 .btn-dropdown {
@@ -138,6 +140,10 @@ p{
     cursor: pointer;
 }
 
+.chat-wrapper:hover > .chat {
+    background-color: var(--bg-hover);
+}
+
 .chat-wrapper:hover .btn-dropdown {
     width: unset;
     background-color: var(--bg-hover);
@@ -145,20 +151,23 @@ p{
     transition: padding 200ms ease;
 }
 
-.chat-wrapper.active .btn-dropdown {
-    background-color: var(--bg-hover);
+.chat-wrapper:active > .chat {
+    background-color: var(--bg-active);
 }
 
-.chat-wrapper {
-    width: 100%;
-    position: relative;
+.chat-wrapper:active .btn-dropdown {
+    background-color: var(--bg-active);
+}
+
+.chat-wrapper.active .btn-dropdown {
+    background-color: var(--bg-hover);
 }
 
 .chat-wrapper.active > .chat{
     background-color: var(--bg-hover);
 }
 
-.chat-wrapper.active>.cool-active{
+.chat-wrapper.active > .cool-active{
     z-index: 999;
     position: absolute;
     background-color: white;
@@ -198,7 +207,7 @@ p{
 }
 
 .person:active{
-    background-color: rgb(35, 35, 35);
+    background-color: var(--bg-active);
 }
 
 .person-wrapper > .cool-btn {

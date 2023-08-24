@@ -73,7 +73,6 @@ const CreateGroupModal = () => {
             };
         }
 
-
         await axios.post('/api/chats/group', data)
             .then(res => {
                 setPicture(undefined);
@@ -101,23 +100,14 @@ const CreateGroupModal = () => {
                     <div className="modal-body">
                         <form onSubmit={(e)=>createGroupSubmit(e)}>
 
-                            <div className="dropdown text-center mb-3 ">
-                                <div className="position-relative d-inline-block rounded-circle change-avatar" style={{overflow: 'hidden'}} data-bs-toggle="dropdown" aria-expanded="false">
-                                    {picture ? <img src={URL.createObjectURL(picture)} alt="" style={{width: '150px'}} className='avatar' /> :
-                                    <img src='/default-group.jpg' alt="" style={{width: '150px'}} className='avatar' />}
+                            <div className="text-center mb-3 ">
+                                <label className="position-relative d-inline-block rounded-circle change-avatar" style={{overflow: 'hidden'}}>
+                                    <img src={picture ? URL.createObjectURL(picture) : '/default-group.jpg'} alt="" style={{width: '150px'}} className='avatar' /> 
                                     <div className="position-absolute bottom-0 start-50 w-100 rounded-circle" style={{transform: 'translate(-50%, 0)'}}>
                                         <div className="text-black mt-3 fw-semibold">Change Picture</div>
                                     </div>
-                                </div>
-                                <ul className="dropdown-menu dropdown-menu-dark dropdown-theme-primary">
-                                    <li>
-                                        <label role="button" htmlFor="input-avatar" className="dropdown-item">Upload Image</label>
-                                    </li>
-                                    <li>
-                                        <span role="button" className="dropdown-item">Default</span>
-                                    </li>
-                                </ul>
-                                <input id="input-avatar" type="file" accept="image/*" hidden onChange={(e) => setPicture(e.target.files[0])} />
+                                    <input type="file" accept="image/*" hidden onChange={(e) => setPicture(e.target.files[0])} />
+                                </label>
                             </div>
 
                             <div className="mb-3">

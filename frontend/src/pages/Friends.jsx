@@ -2,13 +2,15 @@ import axios from "axios";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { ChatState } from "../context/ChatProvider";
+import FriendProfileModal from "../components/FriendProfileModal";
 
 const Friends = () => {
     const { friends, setFriends, chats, setChats } = ChatState();
     const [searchAdd, setSearchAdd] = useState('');
     const [searchAddResult, setSearchAddResult] = useState([]);
     const [friendResult, setFriendResult] = useState([]);
-    const [message, setMessage] = useState('Please input')
+    const [selectedFriend, setSelectedFriend] = useState({});
+    const [message, setMessage] = useState('Please input');
 
     const { setSelectedChat } = useOutletContext();
     const searchAddEl = useRef();
@@ -81,7 +83,7 @@ const Friends = () => {
                     <label htmlFor="search" className='position-absolute top-50 user-select-none' style={{left: '15px', translate: '0 -50%'}}>
                         <i className="fa-solid fa-magnifying-glass text-secondary" style={{fontSize: '15px'}}></i>
                     </label>
-                    <input type="search" id='search' className='input-theme ps-5 rounded-pill' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} onChange={(e)=>searchFriends(e.target.value)} />
+                    <input type="search" id='search' className='input-theme ps-5 rounded-pill w-100' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} onChange={(e)=>searchFriends(e.target.value)} />
                 </div>
                 <button className='cool-btn' data-bs-toggle="modal" data-bs-target="#addFriendModal" onClick={()=>setTimeout(()=>{searchAddEl.current?.focus()}, 500)}>
                     <i className="fa-solid fa-user-plus user-select-none" style={{fontSize: '15px'}}></i>
@@ -90,7 +92,7 @@ const Friends = () => {
 
             {friendResult.map(friend=>(
             <div key={friend._id} className='person-wrapper'>
-                <div className="person">
+                <div className="person" data-bs-toggle="modal" data-bs-target="#friendProfileModal" onClick={() => setSelectedFriend(friend)}>
                     <div className='person-avatar'>
                         <div className={friend.online ? 'online' : 'offline'}></div>
                         <img src={friend.avatar} alt="" className="avatar" style={{height: '100%'}} />
@@ -103,7 +105,7 @@ const Friends = () => {
             </div>
             ))}
 
-            {/* Modal */}
+            {/* Modal Add friend*/}
             <div className="modal fade" id="addFriendModal" tabIndex="-1" aria-hidden="true" data-bs-theme="dark">
                 <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                     <div className="modal-content bg-theme-primary">
@@ -118,7 +120,7 @@ const Friends = () => {
                                         <label htmlFor="search-add" className='position-absolute top-50 user-select-none' style={{left: '15px', translate: '0 -50%'}}>
                                             <i className="fa-solid fa-magnifying-glass text-secondary" style={{fontSize: '15px'}}></i>
                                         </label>
-                                        <input type="search" id='search-add' ref={searchAddEl} className='input-theme ps-5' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} autoComplete="off" onChange={(e)=>setSearchAdd(e.target.value)} />
+                                        <input type="search" id='search-add' ref={searchAddEl} className='input-theme ps-5 w-100' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} autoComplete="off" onChange={(e)=>setSearchAdd(e.target.value)} />
                                     </div>
                                 </form>
                                 <hr className="text-white mb-0" />
@@ -147,6 +149,9 @@ const Friends = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modal Friend Profile */}
+            <FriendProfileModal friend={selectedFriend} handleSelectFriend={handleSelectFriend} />
         </>
     )
 }

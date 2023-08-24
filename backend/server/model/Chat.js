@@ -6,7 +6,8 @@ const chatSchema = new Schema({
         default: false
     },
     picture: {
-        type: String
+        type: String,
+        default: '/default-group.jpg'
     },
     chatName: {
         type: String,

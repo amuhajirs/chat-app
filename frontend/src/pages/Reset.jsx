@@ -14,7 +14,7 @@ const Reset = () => {
 
     useEffect(()=>{
         const verify = async ()=>{
-            await axios.post('/api/auth/verify', {token})
+            await axios.post('/api/auth/verify-token', {token})
                 .then(res=>{
                     setIsInvalid(false);
                     setEmail(res.data.email);
@@ -26,24 +26,31 @@ const Reset = () => {
         }
 
         verify();
-    });
+    }, [token]);
 
-    const handleSubmit = (e)=>{
+    const handleSubmit = async (e)=>{
         e.preventDefault();
         setIsLoading(true);
 
-        if(newPassword===confirmPassword){
-            axios.post('/api/auth/reset', {token, password: newPassword})
+        if(newPassword!==confirmPassword){
+            alert('Confirm Password Wrong');
+            setIsLoading(false);
+            return;
+        }
+
+        if(newPassword.length < 8) {
+            alert('Password length at least 8 letters');
+            setIsLoading(false);
+            return;
+        }
+
+        await axios.post('/api/auth/reset', {token, password: newPassword})
                 .then(res=>{
                     console.log(res.data);
                     navigate('/login');
                 })
                 .catch(err=>console.error(err.response))
                 .finally(()=>setIsLoading(false));
-        } else{
-            alert('Confirm Password Wrong');
-            setIsLoading(false);
-        }
     }
 
     return (
@@ -60,21 +67,21 @@ const Reset = () => {
 
                     <div className="row">
                         <div className="col">
-                            <form method="POST" onSubmit={handleSubmit} className="mb-3">
+                            <form onSubmit={handleSubmit} className="mb-3">
                                 <div className="mb-3">
                                     <p className="text-center">Enter your new password for <b>{email}</b></p>
                                 </div>
                                 <div className="mb-4 field-theme">
-                                    <input type="password" className="input-theme rounded-pill" id="newPassword" onChange={(e)=>setNewPassword(e.target.value)} required />
+                                    <input type="password" className="input-theme rounded-2 w-100" id="newPassword" onChange={(e)=>setNewPassword(e.target.value)} required />
                                     <label htmlFor="newPassword">New Password</label>
                                 </div>
                                 <div className="mb-4 field-theme">
-                                    <input type="password" className="input-theme rounded-pill" id="confirmPassword" onChange={(e)=>setConfirmPassword(e.target.value)} required />
+                                    <input type="password" className="input-theme rounded-2 w-100" id="confirmPassword" onChange={(e)=>setConfirmPassword(e.target.value)} required />
                                     <label htmlFor="confirmPassword">Confirm Password</label>
                                 </div>
                                 {!isLoading ? (
-                                <button type="submit" className="btn btn-primary w-100 rounded-pill">Reset Password</button>) : (
-                                <button type="submit" className="btn btn-primary w-100 rounded-pill" disabled>Resetting...</button>
+                                <button type="submit" className="btn btn-primary w-100 rounded-2">Reset Password</button>) : (
+                                <button type="submit" className="btn btn-primary w-100 rounded-2" disabled>Resetting...</button>
                                 )}
                             </form>
                         </div>

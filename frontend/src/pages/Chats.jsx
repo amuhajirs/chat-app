@@ -93,7 +93,7 @@ const Chats = () => {
                 <label htmlFor="search" className='position-absolute top-50 unselectable' style={{left: '15px', translate: '0 -50%'}}>
                     <i className="fa-solid fa-magnifying-glass text-secondary" style={{fontSize: '15px'}}></i>
                 </label>
-                <input type="search" id='search' className='input-theme ps-5 rounded-pill' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} onChange={(e) => searchChats(e.target.value)} />
+                <input type="search" id='search' className='input-theme ps-5 rounded-pill w-100' placeholder='Search' style={{fontSize: '15px', padding: '7px'}} onChange={(e) => searchChats(e.target.value)} />
             </div>
             <button className='cool-btn' data-bs-toggle="modal" data-bs-target="#newChatModal">
                 <i className="fa-solid fa-plus unselectable" style={{fontSize: '15px'}}></i>
