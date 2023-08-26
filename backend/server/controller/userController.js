@@ -4,12 +4,11 @@ import User from "../model/User.js";
 export const searchUser = async (req, res)=>{
     const { username } = req.params;
 
-    const users = await User.find({
+    const users = await User.findOne({
         _id: { $ne: req.user._id },
         username: username
     })
-        .select(['-password', '-friends', '-chats'])
-        .sort([['username', 'asc']]);
+        .select(['-password', '-friends', '-chats']);
 
     res.json({data: users});
 }

@@ -2,7 +2,7 @@ import { ChatState } from '../context/ChatProvider';
 import { isSameSenderLast, isLastMessage, isSameSenderFirst, isFirstMessage, isSameSender, isLastMessageIncludeMe } from '../config/ChatLogics';
 import moment from 'moment';
 
-const GroupChat = ({ messages, setSelectedFriend }) => {
+const GroupChat = ({ messages, setSelectedUser }) => {
     const { user } = ChatState();
 
     return (
@@ -10,7 +10,7 @@ const GroupChat = ({ messages, setSelectedFriend }) => {
         {messages.map((m, i) => (
             <div key={i} className={`d-flex ${isSameSender(messages, m, i) ? 'mb-3' : 'mb-1'}`}>
                 {(isSameSenderLast(messages, m, i, user.data?._id) || isLastMessage(messages, i, user.data?._id)) ? (
-                <div role='button' className='mt-auto' data-bs-toggle="modal" data-bs-target="#friendProfileModal" onClick={() => setSelectedFriend(m.sender)}>
+                <div role='button' className='mt-auto' data-bs-toggle="modal" data-bs-target="#userProfileModal" onClick={() => setSelectedUser(m.sender)}>
                     <img src={m.sender.avatar} alt="" style={{width: '30px'}} className='avatar' />
                 </div>) : (
                 <div style={{width: '30px'}}></div>)}

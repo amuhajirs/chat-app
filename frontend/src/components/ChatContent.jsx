@@ -4,7 +4,7 @@ import GroupChat from './GroupChat';
 import SingleChat from './SingleChat';
 import { socket } from '../socket';
 
-const ChatContent = ({ selectedChat, setMessageIsLoading, setSelectedFriend }) => {
+const ChatContent = ({ selectedChat, setMessageIsLoading, setSelectedUser }) => {
     const [ messages, setMessages] = useState([]);
 
     useEffect(() => {
@@ -53,7 +53,7 @@ const ChatContent = ({ selectedChat, setMessageIsLoading, setSelectedFriend }) =
 
     return (
         selectedChat.isGroupChat ? (
-        <GroupChat messages={messages} setSelectedFriend={setSelectedFriend} />) : (
+        <GroupChat messages={messages} setSelectedUser={setSelectedUser} />) : (
         <SingleChat messages={messages} />
         )
     )

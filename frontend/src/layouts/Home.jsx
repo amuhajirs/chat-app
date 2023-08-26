@@ -10,12 +10,12 @@ import ChatContent from '../components/ChatContent';
 import send from '../assets/send.svg';
 import ProfileModal from '../components/ProfileModal';
 import { showChat } from '../config/ChatLogics';
-import FriendProfileModal from '../components/FriendProfileModal';
+import UserProfileModal from '../components/UserProfileModal';
 
 const Home = ()=>{
   const { user, setUser, chats, setChats, setFriends, selectedChat } = ChatState();
   const [messageIsLoading, setMessageIsLoading] = useState(false);
-  const [selectedFriend, setSelectedFriend] = useState({});
+  const [selectedUser, setSelectedUser] = useState({});
 
   const navigate = useNavigate();
   const inputEl = useRef();
@@ -117,7 +117,7 @@ const Home = ()=>{
           </div>
 
           <div className='contact-content'>
-            <Outlet context={{setSelectedFriend}} />
+            <Outlet context={{ setSelectedUser }} />
           </div>
 
           <div className='profile p-3'>
@@ -155,7 +155,7 @@ const Home = ()=>{
 
             <div className="messages-content">
               <div className='container my-3'>
-                <ChatContent selectedChat={selectedChat} setMessageIsLoading={setMessageIsLoading} setSelectedFriend={setSelectedFriend} />
+                <ChatContent selectedChat={selectedChat} setMessageIsLoading={setMessageIsLoading} setSelectedUser={setSelectedUser} />
               </div>
             </div>
 
@@ -189,7 +189,7 @@ const Home = ()=>{
     <ProfileModal />
 
     {/* Modal Friend Profile */}
-    <FriendProfileModal friend={selectedFriend} />
+    <UserProfileModal user={selectedUser} />
     </>
   )
 }

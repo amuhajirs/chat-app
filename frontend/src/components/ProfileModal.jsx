@@ -176,7 +176,7 @@ const ProfileModal = () => {
 
                             {/* Display Name */}
                             <div className="position-relative bg-dark rounded p-1 ps-3 pe-5 d-flex align-items-center gap-3 border mb-2">
-                                <i className="fa-solid fa-user fs-5"></i>
+                                <i className="fa-solid fa-address-card fs-5"></i>
                                 <div style={{width: '75%'}}>
                                     <p style={{fontSize: '14px'}}>Display Name</p>
                                     {!isEditDisplayName ? <p className="fw-semibold">{user.data?.displayName}</p> : 

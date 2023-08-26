@@ -20,8 +20,7 @@ const DropdownChat = ({chat}) => {
                 if(selectedChat?._id===chatId) {
                     setSelectedChat(undefined);
                 }
-                const removedChats = chats.filter(c => c._id !== chatId);
-                setChats(removedChats);
+                setChats(chats.filter(c => c._id !== chatId));
             })
             .catch(err => console.error(err))
             .finally(() => setIsLoading(false));

@@ -2,18 +2,21 @@ import axios from "axios";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { ChatState } from "../context/ChatProvider";
+import FriendProfileModal from "../components/FriendProfileModal";
 
 const Friends = () => {
-    const { friends, setFriends, chats, setChats, setSelectedChat } = ChatState();
-    const { setSelectedFriend } = useOutletContext();
+    const { friends, chats, setChats, setSelectedChat } = ChatState();
+    const { setSelectedUser } = useOutletContext();
 
     const [searchAdd, setSearchAdd] = useState('');
-    const [searchAddResult, setSearchAddResult] = useState([]);
     const [friendResult, setFriendResult] = useState([]);
     const [message, setMessage] = useState('Search by username');
+    const [selectedFriend, setSelectedFriend] = useState();
 
     const searchAddEl = useRef();
-    const navigate = useNavigate()
+    const addFriendModal = useRef();
+
+    const navigate = useNavigate();
 
     useEffect(()=>{;
         friends?.sort((a, b) => {
@@ -42,24 +45,28 @@ const Friends = () => {
         if(searchAdd){
             await axios.get(`/api/users/${searchAdd}`)
                 .then(res=>{
-                    setSearchAddResult(res.data.data);
-                    setMessage('User not found');
+                    setSelectedUser(res.data.data);
+
+                    const modalEl = document.querySelector('#userProfileModal');
+                    let modal = window.bootstrap.Modal.getInstance(modalEl);
+                    if(!modal) {
+                        modal = new window.bootstrap.Modal(modalEl);
+                    }
+
+                    if(!res.data.data) {
+                        setMessage('User not found');
+                        return
+                    }
+
+                    setMessage('Search by username');
+                    modal.show();
+
+                    setTimeout(() => {
+                        modalEl.focus();
+                    }, 500)
                 })
                 .catch(err=>console.error(err.response));
         }
-    }
-
-    // Add or Remove to friendlist
-    const handleEditFriends = async (userId) => {
-        await axios.put('/api/users/friends/edit', {userId})
-            .then(res => {
-                if (!friends?.find(f => f._id === userId)) {
-                    setFriends([...friends, res.data.data]);
-                } else {
-                    setFriends(friends?.filter(f => f._id !== userId));
-                }
-            })
-            .catch(err => console.error(err.response));
     }
 
     // Start chat with friend
@@ -105,12 +112,12 @@ const Friends = () => {
             ))}
 
             {/* Modal Add friend*/}
-            <div className="modal fade" id="addFriendModal" tabIndex="-1" aria-hidden="true" data-bs-theme="dark">
+            <div className="modal fade" id="addFriendModal" tabIndex="-1" aria-hidden="true" data-bs-theme="dark" ref={addFriendModal}>
                 <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                     <div className="modal-content bg-theme-primary">
                         <div className="modal-header">
                             <h1 className="modal-title fs-5">Add Friend</h1>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="addFriendModalClose"></button>
                         </div>
                         <div className="modal-body pt-0">
                             <div className="sticky-top bg-theme-primary pt-3">
@@ -124,33 +131,13 @@ const Friends = () => {
                                 </form>
                                 <hr className="text-white mb-0" />
                             </div>
-                            {searchAddResult[0] ? (searchAddResult.map(u=>(
-                            <div key={u._id}>
-                                <div className="d-flex justify-content-start align-items-center gap-2 py-2" style={{height: '70px'}}>
-                                    <img src={u.avatar} alt="" style={{height: '100%'}} className="avatar" />
-                                    <div>
-                                        <h6 className="mb-1">{u.username}</h6>
-                                        <p className="text-seconday" style={{ fontSize: '13px' }}>{u.displayName}</p>
-                                    </div>
-                                    {!friends?.find(f => f._id === u._id) ? (
-                                    <button className="btn btn-primary ms-auto" onClick={()=>handleEditFriends(u._id)}>
-                                        <i className="fa-solid fa-user-plus"></i> Add
-                                    </button>
-                                    ) : (
-                                    <button className="btn btn-outline-primary ms-auto" onClick={()=>handleEditFriends(u._id)}>
-                                        <i className="fa-solid fa-user-minus"></i> Remove
-                                    </button>
-                                    )}
-                                </div>
-                                <hr className="text-white m-0" />
-                            </div>
-                            ))) : (
-                            <h6 className="text-center mt-3">{message}</h6>)
-                            }
+                            <h6 className="text-center mt-3">{message}</h6>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <FriendProfileModal friend={selectedFriend} />
         </>
     )
 }
