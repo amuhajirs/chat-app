@@ -21,7 +21,7 @@ const CreateGroupModal = () => {
     const searchFriends = (search) => {
         setAddUser(search);
         let re = new RegExp(search, 'i');
-        const filteredFriends = friends?.filter(friend => friend.username.match(re));
+        const filteredFriends = friends?.filter(friend => friend.displayName.match(re) || friend.username.match(re));
         setFriendResult(search ? filteredFriends : []);
     }
 
@@ -111,14 +111,14 @@ const CreateGroupModal = () => {
                             </div>
 
                             <div className="mb-3">
-                                <input type="text" className="input-theme rounded" placeholder="Group Name" value={chatName} onChange={(e) => setChatName(e.target.value)} />
+                                <input type="text" className="input-theme rounded w-100" placeholder="Group Name" value={chatName} onChange={(e) => setChatName(e.target.value)} />
                                 <span className='text-danger ms-1' style={{fontSize: '12px'}}>{error.chatName}</span>
                             </div>
                             <div className="mb-2">
-                                <textarea className="input-theme rounded" placeholder="Description (optional)" value={chatDesc} onChange={(e) => setChatDesc(e.target.value)}></textarea>
+                                <textarea className="input-theme rounded w-100" placeholder="Description (optional)" value={chatDesc} onChange={(e) => setChatDesc(e.target.value)}></textarea>
                             </div>
                             <div className="mb-3">
-                                <input type="text" className="input-theme rounded" placeholder="Add Member" value={addUser} onChange={(e) => searchFriends(e.target.value)} />
+                                <input type="text" className="input-theme rounded w-100" placeholder="Add Member" value={addUser} onChange={(e) => searchFriends(e.target.value)} />
                                 <span className='text-danger ms-1' style={{fontSize: '12px'}}>{error.users}</span>
                             </div>
                             <div className="mb-3">
@@ -143,7 +143,7 @@ const CreateGroupModal = () => {
                                             <img src={friend.avatar} alt="" className='avatar' style={{height: '100%'}} />
                                         </div>
                                         <div>
-                                            <span>{friend.username}</span>
+                                            <span>{friend.displayName}</span>
                                         </div>
                                     </div>
                                 </div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { socket } from "../socket";
 
@@ -9,10 +9,8 @@ import { showChat, showLatestMessage } from "../config/ChatLogics";
 import DropdownChat from "../components/DropdownChat";
 
 const Chats = () => {
-    const { user, chats, setChats } = ChatState();
+    const { user, chats, setChats, selectedChat, setSelectedChat } = ChatState();
     const [chatResults, setChatResults] = useState([]);
-
-    const { selectedChat, setSelectedChat } = useOutletContext();
 
     const navigate = useNavigate();
     const newChatModal = useRef();
@@ -104,13 +102,13 @@ const Chats = () => {
         <div key={chat._id} className={`chat-wrapper ${selectedChat?._id===chat._id ? 'active' : ''}`}>
             <div className="cool-active"></div>
             <div className="chat" onClick={() => setSelectedChat(chat)}>
-                <img src={chat.isGroupChat ? chat.picture : showChat(chat, user.data?.username).avatar} className="avatar" alt="" />
+                <img src={chat.isGroupChat ? chat.picture : showChat(chat, user.data?._id).avatar} className="avatar" alt="" />
                 <div className="d-flex align-items-center" style={{width: 'calc(100% - 20px - 50px)'}}>
                     <div style={{width: '100%'}}>
                         <p>{(chat.isGroupChat) ?
-                            (chat.chatName) : (showChat(chat, user.data?.username).username)}
+                            (chat.chatName) : (showChat(chat, user.data?._id).displayName)}
                         </p>
-                        <p style={{fontSize: '13px', textOverflow: 'ellipsis', width: '100%', whiteSpace: 'nowrap', overflow: 'hidden'}}>{showLatestMessage(chat, user.data?.username)}</p>
+                        <p style={{fontSize: '13px', textOverflow: 'ellipsis', width: '100%', whiteSpace: 'nowrap', overflow: 'hidden'}}>{showLatestMessage(chat, user.data?._id)}</p>
                     </div>
                 </div>
             </div>

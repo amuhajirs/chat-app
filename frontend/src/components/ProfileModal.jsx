@@ -6,13 +6,17 @@ import { MoonLoader } from 'react-spinners';
 
 const ProfileModal = () => {
     const { user, setUser } = ChatState();
+    const [isEditDisplayName, setIsEditDisplayName] = useState(false);
     const [isEditUsername, setIsEditUsername] = useState(false);
     const [isEditEmail, setIsEditEmail] = useState(false);
     const [isEditPassword, setIsEditPassword] = useState(false);
+
+    const [isLoadingDisplayName, setIsLoadingDisplayName] = useState(false);
     const [isLoadingUsername, setIsLoadingUsername] = useState(false);
     const [isLoadingEmail, setIsLoadingEmail] = useState(false);
     const [isLoadingPassword, setIsLoadingPassword] = useState(false);
 
+    const [displayName, setDisplayName] = useState(user.data?.displayName);
     const [username, setUsername] = useState(user.data?.username);
     const [email, setEmail] = useState(user.data?.email);
     const [currentPassword, setCurrentPassword] = useState('');
@@ -25,7 +29,14 @@ const ProfileModal = () => {
     });
 
     const toggleEdit = async (field) => {
-        if(field==='username') {
+        if(field==='displayName') {
+            if(isEditDisplayName) {
+                setIsEditDisplayName(false);
+                setDisplayName(user.data?.displayName);
+            } else {
+                setIsEditDisplayName(true);
+            }
+        } else if(field==='username') {
             if(isEditUsername) {
                 setIsEditUsername(false);
                 setUsername(user.data?.username);
@@ -55,7 +66,15 @@ const ProfileModal = () => {
     const handleSubmit = async (field) => {
         let data;
 
-        if(field==='username') {
+        if(field==='displayName') {
+            // Validate
+            if(!displayName) {
+                return;
+            }
+            
+            setIsLoadingDisplayName(true);
+            data = {displayName};
+        } else if(field==='username') {
             // Validate
             if(!username || username.length <= 2) {
                 return;
@@ -78,13 +97,14 @@ const ProfileModal = () => {
             setIsLoadingPassword(true);
             data = {currentPassword, newPassword}
         }
-        console.log(data)
 
         await axios.patch('/api/auth/update', data)
             .then(res => {
                 setUser({...user, data: res.data.data});
 
-                if(field==='username') {
+                if(field==='displayName') {
+                    setIsEditDisplayName(false);
+                } else if(field==='username') {
                     setIsEditUsername(false);
                 } else if (field==='email') {
                     setIsEditEmail(false);
@@ -94,7 +114,9 @@ const ProfileModal = () => {
             })
             .catch(err => console.error(err))
             .finally(() => {
-                if(field==='username') {
+                if(field==='displayName') {
+                    setIsLoadingDisplayName(false);
+                } else if(field==='username') {
                     setIsLoadingUsername(false);
                 } else if (field==='email') {
                     setIsLoadingEmail(false);
@@ -152,6 +174,33 @@ const ProfileModal = () => {
                                 <input id="input-avatar" type="file" accept="image/*" hidden onChange={(e) => {changeAvatar(e.target.files[0])}} />
                             </div>
 
+                            {/* Display Name */}
+                            <div className="position-relative bg-dark rounded p-1 ps-3 pe-5 d-flex align-items-center gap-3 border mb-2">
+                                <i className="fa-solid fa-user fs-5"></i>
+                                <div style={{width: '75%'}}>
+                                    <p style={{fontSize: '14px'}}>Display Name</p>
+                                    {!isEditDisplayName ? <p className="fw-semibold">{user.data?.displayName}</p> : 
+                                    <input type="text" className="form-control" placeholder="Change Display Name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />}
+                                </div>
+                                <div className="position-absolute top-50" style={{transform: 'translate(0, -50%)', right: '20px'}}>
+                                    { isLoadingDisplayName ? <div className="d-flex"><MoonLoader color="rgb(255, 255, 255)" size={20} /></div> :
+                                    !isEditDisplayName ? (
+                                        <button onClick={() => toggleEdit('displayName')}>
+                                            <i className="fa-solid fa-pen"></i>
+                                        </button>) : (
+                                    <>
+                                        <button onClick={() => toggleEdit('displayName')} className="me-3">
+                                            <i className="fa-solid fa-xmark fs-5"></i>
+                                        </button>
+                                        <button onClick={() => handleSubmit('displayName')}>
+                                            <i className="fa-solid fa-check fs-5"></i>
+                                        </button>
+                                    </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Username */}
                             <div className="position-relative bg-dark rounded p-1 ps-3 pe-5 d-flex align-items-center gap-3 border mb-2">
                                 <i className="fa-solid fa-user fs-5"></i>
                                 <div style={{width: '75%'}}>
@@ -177,6 +226,7 @@ const ProfileModal = () => {
                                 </div>
                             </div>
 
+                            {/* Email */}
                             <div className="position-relative bg-dark rounded p-1 ps-3 pe-5 d-flex align-items-center gap-3 border mb-2">
                                 <i className="fa-solid fa-envelope fs-5"></i>
                                 <div style={{width: '75%'}}>
@@ -202,6 +252,7 @@ const ProfileModal = () => {
                                 </div>
                             </div>
 
+                            {/* Password */}
                             <div className="position-relative bg-dark rounded p-1 ps-3 pe-5 d-flex align-items-center gap-3 border mb-5">
                                 <i className="fa-solid fa-lock fs-5"></i>
                                 <div style={{width: '75%'}}>

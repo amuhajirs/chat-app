@@ -1,15 +1,12 @@
 import User from "../model/User.js";
 
-// GET /api/users
-export const allUsers = async (req, res)=>{
-    const { search } = req.query;
+// GET /api/users/:username
+export const searchUser = async (req, res)=>{
+    const { username } = req.params;
 
     const users = await User.find({
         _id: { $ne: req.user._id },
-        username: {
-            $regex: search ? search : '',
-            $options: 'i'
-        }
+        username: username
     })
         .select(['-password', '-friends', '-chats'])
         .sort([['username', 'asc']]);
@@ -17,7 +14,7 @@ export const allUsers = async (req, res)=>{
     res.json({data: users});
 }
 
-// GET /api/users/friends
+// GET /api/users/friends?search=
 export const getFriends = async (req, res)=>{
     const { search } = req.query;
 
@@ -29,7 +26,7 @@ export const getFriends = async (req, res)=>{
         }
     })
         .select(['-password', '-friends', '-chats'])
-        .sort([['username', 'asc']]);
+        .sort([['displayName', 'asc']]);
 
     res.json({data: friends});
 }

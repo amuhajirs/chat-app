@@ -46,7 +46,7 @@ export const isSameSender = (messages, m, i) => {
 }
 
 // Last message includes me
-export const isLastMessageIncludeMe = (messages, i, userId) => {
+export const isLastMessageIncludeMe = (messages, i) => {
     return (
         (i === messages.length - 1) &&
         messages[messages.length - 1].sender._id
@@ -54,22 +54,22 @@ export const isLastMessageIncludeMe = (messages, i, userId) => {
 }
 
 // Show latest message
-export const showLatestMessage = (chat, myUsername) => {
+export const showLatestMessage = (chat, myId) => {
     return (chat.latestMessage && (
         chat.isGroupChat ? (
             // Group Chat
-            `${chat.latestMessage?.sender.username === myUsername ?
-                'You' : chat.latestMessage?.sender.username}: ${chat.latestMessage?.text}`) : (
+            `${chat.latestMessage?.sender._id === myId ?
+                'You' : chat.latestMessage?.sender.displayName}: ${chat.latestMessage?.text}`) : (
             
             // Personal Chat
-            (chat.latestMessage?.sender.username === myUsername ? 'You: ' : '') + chat.latestMessage?.text
+            (chat.latestMessage?.sender._id === myId ? 'You: ' : '') + chat.latestMessage?.text
         )
     ))
 }
 
 // Show personal chat
-export const showChat = (chat, myUsername) => {
-    return (chat.users[0].username===myUsername) ?
+export const showChat = (chat, myId) => {
+    return (chat.users[0]._id===myId) ?
             (chat.users[1]) :
             (chat.users[0])
 }

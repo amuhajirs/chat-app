@@ -151,7 +151,7 @@ export const login = async (req, res) => {
 
 // PATCH /api/auth/update
 export const updateUser = async (req, res) => {
-    const { username, email, currentPassword, newPassword } = req.body;
+    const { displayName, username, email, currentPassword, newPassword } = req.body;
 
     const user = await User.findById(req.user._id).select(['-chats', '-friends']);
 
@@ -164,6 +164,10 @@ export const updateUser = async (req, res) => {
         }
 
         user.avatar = process.env.CLOUD_URL + req.file.filename;
+    }
+
+    if(displayName) {
+        user.displayName = displayName;
     }
 
     if(username) {
@@ -323,7 +327,13 @@ export const loggedIn = async (req, res)=>{
 export const getData = async (req, res) => {
     try {
         const user = await User.findById(req.user._id)
-            .populate('friends', ['-password', '-friends', '-chats'])
+            .populate({
+                path: 'friends',
+                select: ['-password', '-friends', '-chats'],
+                options: {
+                    sort: {displayName: 1}
+                }
+            })
             .populate({
                 path: 'chats',
                 populate: {

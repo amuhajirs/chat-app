@@ -8,6 +8,7 @@ const ChatProvider = ({children}) => {
     const [friends, setFriends] = useState([]);
     const [chats, setChats] = useState([]);
     const [notif, setNotif] = useState([]);
+    const [selectedChat, setSelectedChat] = useState();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -15,7 +16,7 @@ const ChatProvider = ({children}) => {
         const fetchUser = async () => {
             await axios.get('/api/auth/loggedIn')
                 .then(res => {
-                    setUser({login: res.data.login, data: res.data.data});
+                    setUser(res.data);
                 })
                 .catch(() => {
                     setUser({login: false});
@@ -35,7 +36,9 @@ const ChatProvider = ({children}) => {
             chats,
             setChats,
             notif,
-            setNotif
+            setNotif,
+            selectedChat,
+            setSelectedChat
         }}>
             {!isLoading && children}
         </ChatContext.Provider>

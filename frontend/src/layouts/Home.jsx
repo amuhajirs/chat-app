@@ -10,11 +10,12 @@ import ChatContent from '../components/ChatContent';
 import send from '../assets/send.svg';
 import ProfileModal from '../components/ProfileModal';
 import { showChat } from '../config/ChatLogics';
+import FriendProfileModal from '../components/FriendProfileModal';
 
 const Home = ()=>{
-  const { user, setUser, chats, setChats, setFriends } = ChatState();
-  const [selectedChat, setSelectedChat] = useState();
+  const { user, setUser, chats, setChats, setFriends, selectedChat } = ChatState();
   const [messageIsLoading, setMessageIsLoading] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState({});
 
   const navigate = useNavigate();
   const inputEl = useRef();
@@ -116,13 +117,13 @@ const Home = ()=>{
           </div>
 
           <div className='contact-content'>
-            <Outlet context={{ selectedChat, setSelectedChat }} />
+            <Outlet context={{setSelectedFriend}} />
           </div>
 
           <div className='profile p-3'>
             <div className='d-flex column-gap-2 align-items-center' data-bs-toggle="modal" data-bs-target="#profileModal" style={{cursor: 'pointer'}}>
               <img src={user.data?.avatar} alt="" style={{height: '40px'}} className='avatar' />
-              <span>{user.data?.username}</span>
+              <span>{user.data?.displayName}</span>
               <sup><i className="fa-solid fa-pen-to-square"></i></sup>
             </div>
             <div className='cool-btn' onClick={logout}>
@@ -139,8 +140,8 @@ const Home = ()=>{
             <div className='recipient p-3'>
               {!messageIsLoading ? (
                 <>
-                  <img src={selectedChat.isGroupChat ? '/default-group.jpg' : (showChat(selectedChat, user.data?.username).avatar)} alt="" style={{height: '40px'}} className='avatar' />
-                  <span>{(selectedChat.isGroupChat) ? (selectedChat.chatName) : (showChat(selectedChat, user.data?.username).username)}</span>
+                  <img src={selectedChat.isGroupChat ? selectedChat.picture : showChat(selectedChat, user.data?._id).avatar} alt="" style={{height: '40px'}} className='avatar' />
+                  <span>{selectedChat.isGroupChat ? selectedChat.chatName : showChat(selectedChat, user.data?._id).displayName}</span>
                 </>
                 ) : (
                 <>
@@ -154,7 +155,7 @@ const Home = ()=>{
 
             <div className="messages-content">
               <div className='container my-3'>
-                <ChatContent selectedChat={selectedChat} setMessageIsLoading={setMessageIsLoading} />
+                <ChatContent selectedChat={selectedChat} setMessageIsLoading={setMessageIsLoading} setSelectedFriend={setSelectedFriend} />
               </div>
             </div>
 
@@ -184,7 +185,11 @@ const Home = ()=>{
       </div>
     </div>
 
+    {/* Modal Profile */}
     <ProfileModal />
+
+    {/* Modal Friend Profile */}
+    <FriendProfileModal friend={selectedFriend} />
     </>
   )
 }

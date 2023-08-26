@@ -2,26 +2,25 @@ import axios from "axios";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { ChatState } from "../context/ChatProvider";
-import FriendProfileModal from "../components/FriendProfileModal";
 
 const Friends = () => {
-    const { friends, setFriends, chats, setChats } = ChatState();
+    const { friends, setFriends, chats, setChats, setSelectedChat } = ChatState();
+    const { setSelectedFriend } = useOutletContext();
+
     const [searchAdd, setSearchAdd] = useState('');
     const [searchAddResult, setSearchAddResult] = useState([]);
     const [friendResult, setFriendResult] = useState([]);
-    const [selectedFriend, setSelectedFriend] = useState({});
-    const [message, setMessage] = useState('Please input');
+    const [message, setMessage] = useState('Search by username');
 
-    const { setSelectedChat } = useOutletContext();
     const searchAddEl = useRef();
     const navigate = useNavigate()
 
     useEffect(()=>{;
         friends?.sort((a, b) => {
-            if ( a.username < b.username ){
+            if ( a.displayName < b.displayName ){
                 return -1;
             }
-            if ( a.username > b.username ){
+            if ( a.displayName > b.displayName ){
                 return 1;
             }
             return 0;
@@ -32,7 +31,7 @@ const Friends = () => {
     // Search friend
     const searchFriends = (search)=>{
         const re = new RegExp(search, 'i');
-        const filteredFriends = friends?.filter(friend => friend.username.match(re));
+        const filteredFriends = friends?.filter(friend => friend.displayName.match(re) || friend.username.match(re));
         setFriendResult(filteredFriends);
     }
 
@@ -41,7 +40,7 @@ const Friends = () => {
         e.preventDefault();
 
         if(searchAdd){
-            await axios.get(`/api/users?search=${searchAdd}`)
+            await axios.get(`/api/users/${searchAdd}`)
                 .then(res=>{
                     setSearchAddResult(res.data.data);
                     setMessage('User not found');
@@ -63,8 +62,8 @@ const Friends = () => {
             .catch(err => console.error(err.response));
     }
 
-    // Select friend
-    const handleSelectFriend = async (id) => {
+    // Start chat with friend
+    const startPrivateChat = async (id) => {
         await axios.post('/api/chats', {userId: id})
             .then(res => {
                 setSelectedChat(res.data.data);
@@ -98,10 +97,10 @@ const Friends = () => {
                         <img src={friend.avatar} alt="" className="avatar" style={{height: '100%'}} />
                     </div>
                     <div>
-                        <span>{friend.username}</span>
+                        <span>{friend.displayName}</span>
                     </div>
                 </div>
-                <button className="cool-btn" onClick={()=>handleSelectFriend(friend._id)}><i className="fa-solid fa-message" style={{fontSize: '12px'}}></i></button>
+                <button className="cool-btn" onClick={()=>startPrivateChat(friend._id)}><i className="fa-solid fa-message" style={{fontSize: '12px'}}></i></button>
             </div>
             ))}
 
@@ -129,16 +128,19 @@ const Friends = () => {
                             <div key={u._id}>
                                 <div className="d-flex justify-content-start align-items-center gap-2 py-2" style={{height: '70px'}}>
                                     <img src={u.avatar} alt="" style={{height: '100%'}} className="avatar" />
-                                    <h6>{u.username}</h6>
-                                        {!friends?.find(f => f._id === u._id) ? (
-                                        <button className="btn btn-primary ms-auto" onClick={()=>handleEditFriends(u._id)}>
-                                            <i className="fa-solid fa-user-plus"></i> Add
-                                        </button>
-                                        ) : (
-                                        <button className="btn btn-outline-primary ms-auto" onClick={()=>handleEditFriends(u._id)}>
-                                            <i className="fa-solid fa-user-minus"></i> Remove
-                                        </button>
-                                        )}
+                                    <div>
+                                        <h6 className="mb-1">{u.username}</h6>
+                                        <p className="text-seconday" style={{ fontSize: '13px' }}>{u.displayName}</p>
+                                    </div>
+                                    {!friends?.find(f => f._id === u._id) ? (
+                                    <button className="btn btn-primary ms-auto" onClick={()=>handleEditFriends(u._id)}>
+                                        <i className="fa-solid fa-user-plus"></i> Add
+                                    </button>
+                                    ) : (
+                                    <button className="btn btn-outline-primary ms-auto" onClick={()=>handleEditFriends(u._id)}>
+                                        <i className="fa-solid fa-user-minus"></i> Remove
+                                    </button>
+                                    )}
                                 </div>
                                 <hr className="text-white m-0" />
                             </div>
@@ -149,9 +151,6 @@ const Friends = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Modal Friend Profile */}
-            <FriendProfileModal friend={selectedFriend} handleSelectFriend={handleSelectFriend} />
         </>
     )
 }

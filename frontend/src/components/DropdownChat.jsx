@@ -2,13 +2,11 @@ import axios from "axios";
 import { useRef, useState } from "react";
 
 import { ChatState } from "../context/ChatProvider";
-import { useOutletContext } from "react-router-dom";
 
 const DropdownChat = ({chat}) => {
     const [chatId, setChatId] = useState();
     const [isLoading, setIsLoading] = useState(false);
-    const { chats, setChats } = ChatState();
-    const { selectedChat, setSelectedChat } = useOutletContext();
+    const { chats, setChats, selectedChat, setSelectedChat } = ChatState();
 
     const deleteConfirmModal = useRef();
     const exitConfirmModal = useRef();
