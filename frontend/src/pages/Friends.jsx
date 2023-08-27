@@ -19,14 +19,22 @@ const Friends = () => {
     const navigate = useNavigate();
 
     useEffect(()=>{;
-        friends?.sort((a, b) => {
+        friends.sort((a, b) => {
+            let result = 0;
+
             if ( a.displayName < b.displayName ){
-                return -1;
+                result -= 1;
+            } else if ( a.displayName > b.displayName ){
+                result += 1;
             }
-            if ( a.displayName > b.displayName ){
-                return 1;
+
+            if(a.isOnline && !b.isOnline) {
+                result -= 2;
+            } else if(!a.isOnline && b.isOnline) {
+                result += 2;
             }
-            return 0;
+            
+            return result;
         });
         setFriendResult(friends);
     }, [friends]);
@@ -100,7 +108,7 @@ const Friends = () => {
             <div key={friend._id} className='person-wrapper'>
                 <div className="person" data-bs-toggle="modal" data-bs-target="#friendProfileModal" onClick={() => setSelectedFriend(friend)}>
                     <div className='person-avatar'>
-                        <div className={friend.online ? 'online' : 'offline'}></div>
+                        <div className={friend.isOnline ? 'online' : 'offline'}></div>
                         <img src={friend.avatar} alt="" className="avatar" style={{height: '100%'}} />
                     </div>
                     <div>

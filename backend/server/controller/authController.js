@@ -118,7 +118,7 @@ export const login = async (req, res) => {
             {email: emailUsername},
             {username: emailUsername}
         ]
-    }).select(['-chats', '-friends']);
+    }).select(['-chats', '-friends', '-isOnline']);
 
     if(!user){
         return res.status(401).json({message: 'Bad Credentials'});
@@ -312,7 +312,7 @@ export const loggedIn = async (req, res)=>{
         try {
             const decoded = jwt.verify(token, process.env.JWT_KEY);
             const user = await User.findById(decoded._id)
-                .select(['-password', '-chats', '-friends']);
+                .select(['-password', '-chats', '-friends', '-isOnline']);
 
             res.json({login: true, data: user});
         } catch (err) {
@@ -331,7 +331,7 @@ export const getData = async (req, res) => {
                 path: 'friends',
                 select: ['-password', '-friends', '-chats'],
                 options: {
-                    sort: {displayName: 1}
+                    sort: {isOnline: -1, displayName: 1}
                 }
             })
             .populate({

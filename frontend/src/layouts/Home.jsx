@@ -13,7 +13,7 @@ import { showChat } from '../config/ChatLogics';
 import UserProfileModal from '../components/UserProfileModal';
 
 const Home = ()=>{
-  const { user, setUser, chats, setChats, setFriends, selectedChat } = ChatState();
+  const { user, setUser, chats, setChats, friends, setFriends, selectedChat } = ChatState();
   const [messageIsLoading, setMessageIsLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
 
@@ -40,16 +40,51 @@ const Home = ()=>{
   }, []);
 
   useEffect(() => {
-    // Join to my room
-    if(user.data) {
-      socket.emit('join rooms', user.data?._id);
-    }
-  }, [user]);
+    socket.emit('setup', user.data);
+  }, [user, setUser]);
+  
 
+  // Online or offline update
   useEffect(() => {
-    // Join to all group chats room
+    const onOnline = userId => {
+      const updatedFriends = friends.map(f => {
+        if(f._id === userId) {
+          f.isOnline = true;
+        }
+        return f;
+      });
+
+      setFriends(updatedFriends);
+    }
+
+    const onOffline = userId => {
+      const updatedFriends = friends.map(f => {
+        if(f._id === userId) {
+          f.isOnline = false;
+        }
+        return f;
+      });
+
+      setFriends(updatedFriends);
+    }
+
+    // When someone online
+    socket.on('online', onOnline);
+
+    // When someone offline
+    socket.on('offline', onOffline);
+  
+    return () => {
+      socket.off('online', onOnline);
+      socket.off('offline', onOffline);
+    }
+  }, [friends, setFriends]);
+  
+
+  // Join to all group chats room
+  useEffect(() => {
     const chatsId = chats.filter(c => c.isGroupChat).map(c => c._id);
-    socket.emit('join rooms', chatsId);
+    socket.emit('join group chats', chatsId);
   }, [chats]);
 
   // Log out

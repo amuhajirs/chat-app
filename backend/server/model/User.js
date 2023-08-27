@@ -39,7 +39,11 @@ const userSchema = new Schema({
     chats: [{
         type: Schema.Types.ObjectId,
         ref: 'Chat'
-    }]
+    }],
+    isOnline: {
+        type: Boolean,
+        default: false
+    }
 }, {timestamps:true, versionKey: false});
 
 userSchema.pre('save', async function(){

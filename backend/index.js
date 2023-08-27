@@ -13,6 +13,7 @@ import './server/config/cloudinary.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import User from './server/model/User.js';
 
 // Set __filename and __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -54,7 +55,24 @@ const io = new Server(server, {
 io.on('connection', socket => {
     console.log(`${socket.id} connected`);
 
-    socket.on('join rooms', ids => {
+    socket.on('setup', async user => {
+        console.log('user: ', user)
+        socket.join(user?._id);
+        
+        io.emit('online', user?._id);
+        await User.findByIdAndUpdate(user?._id, {isOnline: true});
+        user.isOnline = true;
+        socket.data = user;
+    });
+
+    socket.on('disconnect', async () => {
+        console.log(`${socket.id} disconnected`);
+        console.log('user: ', socket.data)
+        io.emit('offline', socket.data._id);
+        await User.findByIdAndUpdate(socket.data._id, {isOnline: false});
+    });
+
+    socket.on('join group chats', ids => {
         socket.join(ids);
         console.log(`${socket.id} joined to: `, socket.rooms);
     });
