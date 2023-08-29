@@ -56,20 +56,20 @@ io.on('connection', socket => {
     console.log(`${socket.id} connected`);
 
     socket.on('setup', async user => {
-        console.log('user: ', user)
+        console.log('connected user: ', user)
         socket.join(user?._id);
         
-        io.emit('online', user?._id);
-        await User.findByIdAndUpdate(user?._id, {isOnline: true});
         user.isOnline = true;
         socket.data = user;
+        // await User.findByIdAndUpdate(user?._id, {isOnline: true});
+        socket.broadcast.emit('online', user?._id);
     });
 
     socket.on('disconnect', async () => {
-        console.log(`${socket.id} disconnected`);
-        console.log('user: ', socket.data)
-        io.emit('offline', socket.data._id);
-        await User.findByIdAndUpdate(socket.data._id, {isOnline: false});
+        console.log('disconnected user: ', socket.data)
+
+        // await User.findByIdAndUpdate(socket.data._id, {isOnline: false});
+        socket.broadcast.emit('offline', socket.data._id);
     });
 
     socket.on('join group chats', ids => {
@@ -78,15 +78,15 @@ io.on('connection', socket => {
     });
 
     socket.on('group message', message => {
-        io.to(message.chat).emit('receive message', message);
+        io.to(message?.chat).emit('receive message', message);
     });
 
     socket.on('private message', message => {   
-        io.to(message.recipient[0]._id).to(message.recipient[1]._id).emit('receive message', message);
+        io.to(message?.recipient[0]._id).to(message?.recipient[1]._id).emit('receive message', message);
     });
 
     socket.on('create group', data => {
-        (data.users).forEach(u => {
+        (data?.users).forEach(u => {
             io.to(u._id).emit('new group', data);
         });
     });

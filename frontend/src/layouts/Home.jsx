@@ -13,7 +13,7 @@ import { showChat } from '../config/ChatLogics';
 import UserProfileModal from '../components/UserProfileModal';
 
 const Home = ()=>{
-  const { user, setUser, chats, setChats, friends, setFriends, selectedChat } = ChatState();
+  const { user, setUser, chats, setChats, friends, setFriends, selectedChat, setSelectedChat } = ChatState();
   const [messageIsLoading, setMessageIsLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
 
@@ -130,11 +130,11 @@ const Home = ()=>{
 
   return (
     <>
-    <div className='container-fluid bg-theme-primary rounded-2'>
-      <div className="row">
+    <div className='bg-theme-primary rounded-2'>
+      <div className="d-flex">
 
         {/* Contact */}
-        <div className="col-lg-3 col-md-4 col-sm-6 contact p-0">
+        <div className={`contact p-0 ${selectedChat && 'deactive'}`}>
           <div className="header">
 
             <div className='p-3'>
@@ -168,15 +168,21 @@ const Home = ()=>{
         </div>
 
         {/* Messages */}
-        <div className="messages col-lg-9 col-md-8 col-sm-6 p-0">
+        <div className='messages p-0'>
 
           {selectedChat ? (
             <>
             <div className='recipient p-3'>
               {!messageIsLoading ? (
                 <>
+                {/* Mobile */}
+                <button onClick={() => setSelectedChat(undefined)} className='back-btn'>
+                  <i className="fa-solid fa-chevron-left"></i>
                   <img src={selectedChat.isGroupChat ? selectedChat.picture : showChat(selectedChat, user.data?._id).avatar} alt="" style={{height: '40px'}} className='avatar' />
-                  <span>{selectedChat.isGroupChat ? selectedChat.chatName : showChat(selectedChat, user.data?._id).displayName}</span>
+                </button>
+
+                <img src={selectedChat.isGroupChat ? selectedChat.picture : showChat(selectedChat, user.data?._id).avatar} alt="" style={{height: '40px'}} className='avatar' />
+                <span>{selectedChat.isGroupChat ? selectedChat.chatName : showChat(selectedChat, user.data?._id).displayName}</span>
                 </>
                 ) : (
                 <>
@@ -190,7 +196,7 @@ const Home = ()=>{
 
             <div className="messages-content">
               <div className='container my-3'>
-                <ChatContent selectedChat={selectedChat} setMessageIsLoading={setMessageIsLoading} setSelectedUser={setSelectedUser} />
+                <ChatContent setMessageIsLoading={setMessageIsLoading} setSelectedUser={setSelectedUser} />
               </div>
             </div>
 
@@ -210,7 +216,7 @@ const Home = ()=>{
           <>
           <div className='d-flex justify-content-center align-items-center flex-column gap-4' style={{height: '100%', backgroundColor: 'black'}}>
             <i className="fa-solid fa-message text-center user-select-none" style={{fontSize: '100px', color: 'gray'}}></i>
-            <h1 className='user-select-none' style={{color: 'gray'}}>Start Conversation</h1>
+            <h1 className='user-select-none text-center' style={{color: 'gray'}}>Start Conversation</h1>
           </div>
           </>
           )}

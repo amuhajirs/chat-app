@@ -29,6 +29,10 @@ p{
 .contact {
     height: var(--height);
     border-right: 1px solid gray;
+    max-width: 380px;
+    min-width: 200px;
+    width: 100%;
+    transition: width 200ms ease;
 }
 
 .header > div:not(.menu, .search){
@@ -276,6 +280,8 @@ p{
 /* Messages */
 .messages {
     height: var(--height);
+    width: 100%;
+    transition: width 200ms ease;
 }
 
 .recipient {
@@ -293,13 +299,14 @@ p{
 }
 
 .message{
+    width: fit-content;
     background-color: rgb(60, 60, 60);
     color: white;
-    width: fit-content;
     max-width: 70%;
     padding: 6px 13px;
     border-radius: 15px;
     word-wrap: break-word;
+    word-break: break-all;
 }
 
 .message.last {
@@ -346,3 +353,50 @@ p{
 }
 
 /* End of Messages */
+
+.back-btn {
+    display: none;
+}
+
+@media only screen and (max-width: 450px) {
+    .back-btn {
+        border-radius: 20px;
+        padding-left: 10px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .back-btn:hover {
+        background-color: var(--bg-hover);
+    }
+    
+    .back-btn ~ img {
+        display: none;
+    }
+
+    .messages {
+        width: 0;
+        overflow-x: hidden;
+    }
+
+    .contact {
+        max-width: 450px;
+        min-width: unset;
+    }
+
+    .contact.deactive {
+        overflow-x: hidden;
+        width: 0;
+    }
+
+    .contact.deactive ~ .messages {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 576px) {
+    body {
+        background-color: var(--bg-primary);
+    }
+}

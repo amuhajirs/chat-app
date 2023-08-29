@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 import GroupChat from './GroupChat';
 import SingleChat from './SingleChat';
 import { socket } from '../socket';
+import { ChatState } from '../context/ChatProvider';
 
-const ChatContent = ({ selectedChat, setMessageIsLoading, setSelectedUser }) => {
+const ChatContent = ({ setMessageIsLoading, setSelectedUser }) => {
     const [ messages, setMessages] = useState([]);
+    const { selectedChat } = ChatState();
 
     useEffect(() => {
         // Get history messages
