@@ -105,3 +105,17 @@
     aspect-ratio: 1/1;
     object-fit: cover;
 }
+
+.btn-profile {
+    padding: 13px 0;
+    transition: all 100ms;
+}
+
+.btn-profile:hover {
+    transition: all 100ms;
+    background-color: var(--bg-hover);
+}
+
+.btn-profile:active {
+    background-color: var(--bg-active);
+}

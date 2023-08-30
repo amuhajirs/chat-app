@@ -3,8 +3,7 @@ import { useRef, useState } from "react";
 
 import { ChatState } from "../context/ChatProvider";
 
-const DropdownChat = ({chat}) => {
-    const [chatId, setChatId] = useState();
+const ConfirmationChat = ({chatId}) => {
     const [isLoading, setIsLoading] = useState(false);
     const { chats, setChats, selectedChat, setSelectedChat } = ChatState();
 
@@ -28,24 +27,6 @@ const DropdownChat = ({chat}) => {
 
     return (
         <>
-        <div className="dropdown">
-            <span className="btn-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <i className="fa-solid fa-angle-down"></i>
-            </span>
-            <ul className="dropdown-menu dropdown-menu-dark dropdown-theme-primary">
-                {chat.isGroupChat ? (
-                    // Group Chat
-                    <li>
-                        <button className="dropdown-item" data-bs-toggle="modal" data-bs-target="#exitGroupConfirmation">Exit Group</button>
-                    </li>) : (
-                    // Private Chat
-                    <li onClick={() => setChatId(chat._id)}>
-                        <button className="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteChatConfirmation">Delete Chat</button>
-                    </li>
-                )}
-            </ul>
-        </div>
-
         {/* Delete Chat confirmation */}
         <div className="modal fade" id="deleteChatConfirmation" tabIndex="-1" aria-hidden="true" data-bs-theme="dark" ref={deleteConfirmModal}>
             <div className="modal-dialog modal-dialog-centered">
@@ -91,4 +72,4 @@ const DropdownChat = ({chat}) => {
     )
 }
 
-export default DropdownChat;
+export default ConfirmationChat;

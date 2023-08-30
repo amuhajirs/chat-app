@@ -1,3 +1,5 @@
+import moment from "moment";
+
 // Same sender but not me check next message
 export const isSameSenderLast = (messages, m, i, userId) => {
     return (
@@ -51,6 +53,15 @@ export const isLastMessageIncludeMe = (messages, i) => {
         (i === messages.length - 1) &&
         messages[messages.length - 1].sender._id
     );
+}
+
+// Show date on different day
+export const isDifferentDay = (messages, m, i) => {
+    return (
+        i > 0 ?
+        moment(messages[i-1]?.createdAt).format('D MMMM YYYY') !== moment(m.createdAt).format('D MMMM YYYY') :
+        true
+    )
 }
 
 // Show latest message

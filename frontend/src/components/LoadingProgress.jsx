@@ -4,13 +4,13 @@ const LoadingProgress = ({ progress }) => {
             <div style={{width: '40%'}}>
                 <div className="w-100 text-center text-white fs-5 mb-3">Getting Data...</div>
                 <div style={{
-                    width: `${(progress || 0) * 100}%`,
+                    width: `${progress}%`,
                     background: 'white',
                     transition: 'width 50ms',
                     height: '5px',
                     borderRadius: '10px'
                 }}></div>
-                <div className="mt-2 text-center w-100 text-white fs-5">{progress * 100}%</div>
+                <div className="mt-2 text-center w-100 text-white fs-5">{progress}%</div>
             </div>
         </div>
     )

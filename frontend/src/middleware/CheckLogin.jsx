@@ -16,7 +16,7 @@ const CheckLogin = ({ type }) => {
 
             await axios.get('/api/auth/data', {
                 onDownloadProgress: (progressEvent) => {
-                    setProgress(progressEvent.progress)
+                    setProgress(Math.floor(progressEvent.progress * 100));
                 }
             })
             .then(res => {

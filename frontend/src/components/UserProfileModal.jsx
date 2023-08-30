@@ -60,17 +60,17 @@ const UserProfileModal = ({ addFriendModal, user }) => {
 
                         <div className="d-flex">
                             {!friends.find(f => f._id === user?._id) ? (
-                            <button className="btn w-100 py-2" onClick={()=>handleEditFriends(user?._id)}>
+                            <button className="btn-profile w-100" onClick={()=>handleEditFriends(user?._id)}>
                                 <i className="fa-solid fa-user-plus"></i> Add
                             </button>
                             ) : (
                             <>
-                            <button className='btn w-100 py-2' onClick={() => startPrivateChat(user?._id)}><i className="fa-solid fa-message me-1"></i> Start Chat</button>
+                            <button className='btn-profile w-100' onClick={() => startPrivateChat(user?._id)}><i className="fa-solid fa-message me-1"></i> Start Chat</button>
 
                             <div className='border'></div>
 
-                            <button className="btn w-100 py-2" onClick={()=>handleEditFriends(user?._id)}>
-                                <i className="fa-solid fa-user-minus"></i> Remove
+                            <button className="btn-profile w-100 text-danger" onClick={()=>handleEditFriends(user?._id)}>
+                                <i className="fa-solid fa-user-minus text-danger"></i> Remove
                             </button>
                             </>
                             )}

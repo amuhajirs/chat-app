@@ -6,11 +6,12 @@ import { socket } from "../socket";
 import { ChatState } from "../context/ChatProvider";
 import CreateGroupModal from "../components/CreateGroupModal";
 import { showChat, showLatestMessage } from "../config/ChatLogics";
-import DropdownChat from "../components/DropdownChat";
+import ConfirmationChat from "../components/ConfirmationChat";
 
 const Chats = () => {
     const { user, chats, setChats, selectedChat, setSelectedChat } = ChatState();
     const [chatResults, setChatResults] = useState([]);
+    const [chatId, setChatId] = useState();
 
     const navigate = useNavigate();
     const newChatModal = useRef();
@@ -73,11 +74,7 @@ const Chats = () => {
             if (c.isGroupChat) {
                 return c.chatName.match(re);
             } else {
-                if (c.users[1].username !== user.data?.username) {
-                    return c.users[1].username.match(re);
-                } else {
-                    return c.users[0].username.match(re);
-                }
+                return showChat(c, user.data?._id).displayName.match(re);
             }
         });
 
@@ -112,7 +109,24 @@ const Chats = () => {
                     </div>
                 </div>
             </div>
-            <DropdownChat chat={chat} />
+
+            <div className="dropdown">
+                <span className="btn-dropdown" data-bs-toggle="dropdown" aria-expanded="false" onClick={() => setChatId(chat._id)}>
+                    <i className="fa-solid fa-angle-down"></i>
+                </span>
+                <ul className="dropdown-menu dropdown-menu-dark dropdown-theme-primary">
+                    {chat.isGroupChat ? (
+                        // Group Chat
+                        <li>
+                            <button className="dropdown-item" data-bs-toggle="modal" data-bs-target="#exitGroupConfirmation">Exit Group</button>
+                        </li>) : (
+                        // Private Chat
+                        <li>
+                            <button className="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteChatConfirmation">Delete Chat</button>
+                        </li>
+                    )}
+                </ul>
+            </div>
         </div>
         ))
         }
@@ -137,6 +151,7 @@ const Chats = () => {
         </div>
 
         <CreateGroupModal chats={chatResults} setChats={setChatResults} />
+        <ConfirmationChat chatId={chatId} />
         </>
     )
 }

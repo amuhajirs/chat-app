@@ -113,6 +113,7 @@ p{
     justify-content: space-between;
     column-gap: 10px;
 }
+/* End of Contact */
 
 /* Chat */
 
@@ -291,6 +292,10 @@ p{
     column-gap: 5px;
 }
 
+.back-btn {
+    display: none;
+}
+
 .messages-content {
     background-color: black;
     height: calc(100% - 70px - 70px);
@@ -354,10 +359,6 @@ p{
 
 /* End of Messages */
 
-.back-btn {
-    display: none;
-}
-
 @media only screen and (max-width: 450px) {
     .back-btn {
         border-radius: 20px;
@@ -383,6 +384,7 @@ p{
     .contact {
         max-width: 450px;
         min-width: unset;
+        border: none;
     }
 
     .contact.deactive {
